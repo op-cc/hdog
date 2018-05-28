@@ -1,0 +1,47 @@
+version: '2'
+
+services:
+
+  hdog-source:
+    image: busybox
+    container_name: hdog-source
+    volumes:
+      - ./../:$SRC_DIR
+
+  hdog-python:
+    build:
+      context: ..
+      dockerfile: docker/python/dev/Dockerfile
+    image: ivnglkv/hdog-python
+    container_name: hdog-python
+    environment:
+      - DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
+      - DB_HOST=hdog-db
+      - DB_NAME=$DB_NAME
+      - DB_USER=$DB_USER
+      - DB_PASS=$DB_PASS
+      - SECRET_KEY=$SECRET_KEY
+    depends_on:
+      - hdog-db
+    networks:
+      - hdog-backend
+    ports:
+      - '$VIRTUAL_HOST_EXPOSE_PORT:$VIRTUAL_HOST_PORT'
+    volumes_from:
+      - hdog-source
+    command: python manage.py runserver 0.0.0.0:$VIRTUAL_HOST_PORT
+
+  hdog-db:
+    image: postgres:9.6
+    restart: always
+    container_name: hdog-db
+    environment:
+      POSTGRES_DB: $DB_NAME
+      POSTGRES_PASSWORD: $DB_PASS
+    networks:
+      - hdog-backend
+    volumes:
+      - /opt/database/hdog:/var/lib/postgresql/data
+
+networks:
+  hdog-backend:

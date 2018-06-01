@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from .models import (
     Measure,
+    Staff,
     Stock,
 )
 
@@ -12,3 +13,8 @@ class MeasureAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Stock)
+
+
+@admin.register(Staff)
+class StaffAdmin(admin.ModelAdmin):
+    list_display = ('surname', 'forename', 'patronymic')

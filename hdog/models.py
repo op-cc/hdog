@@ -51,6 +51,7 @@ class Staff(models.Model):
     class Meta:
         verbose_name = 'сотрудник'
         verbose_name_plural = 'сотрудники'
+        ordering = ('surname',)
 
     def __str__(self):
         result = '{} {}.'.format(self.surname, self.forename[0])

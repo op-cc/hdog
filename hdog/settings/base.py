@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'category',
-    'hdog',
+    'hdog.apps.HDogConfig',
 ]
 
 MIDDLEWARE = [

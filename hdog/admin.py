@@ -49,3 +49,6 @@ class TransferAdmin(admin.ModelAdmin):
     inlines = [
         TransferedGoodsInline,
     ]
+
+
+admin.site.register(InventoryNumber)

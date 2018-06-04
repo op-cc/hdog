@@ -119,7 +119,7 @@ class InventoryNumber(models.Model):
         verbose_name_plural = 'инвентарные номера'
 
     def __str__(self):
-        return self.number
+        return str(self.number)
 
 
 class Transfer(models.Model):

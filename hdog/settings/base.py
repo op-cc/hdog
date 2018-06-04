@@ -37,8 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'category',
-    'hdog',
+    'categories',
+    'categories.editor',
+    'hdog.apps.HDogConfig',
 ]
 
 MIDDLEWARE = [

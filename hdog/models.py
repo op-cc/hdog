@@ -216,7 +216,11 @@ class TransferedGoods(models.Model):
     )
     quantity = models.PositiveIntegerField(verbose_name='количество')
     price = models.PositiveIntegerField(verbose_name='цена')
-    inv_numbers = models.ManyToManyField(InventoryNumber, verbose_name='инвентарные номера')
+    inv_numbers = models.ManyToManyField(
+        InventoryNumber,
+        verbose_name='инвентарные номера',
+        related_name='transfers',
+    )
 
     class Meta:
         verbose_name = 'перемещенные ТМЦ'

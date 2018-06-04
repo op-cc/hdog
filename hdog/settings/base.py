@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'categories',
+    'categories.editor',
     'hdog.apps.HDogConfig',
 ]
 

@@ -3,6 +3,8 @@ from datetime import date
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
+from categories.models import Category
+
 
 class Measure(models.Model):
     key = models.PositiveSmallIntegerField(verbose_name='код', unique=True)
@@ -74,7 +76,7 @@ class Staff(StorePlace):
 
 class Goods(models.Model):
     category = models.ForeignKey(
-        'category.Category',
+        Category,
         verbose_name='категория',
         on_delete=models.CASCADE,
     )

@@ -8,8 +8,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('category', '0002_auto_20180601_1240'),
-        ('contenttypes', '0002_remove_content_type_name'),
         ('hdog', '0002_auto_20180528_1354'),
     ]
 

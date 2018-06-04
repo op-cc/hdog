@@ -1,7 +1,6 @@
 from datetime import date
 
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
 
@@ -22,7 +21,19 @@ class Measure(models.Model):
         return self.name
 
 
-class Stock(models.Model):
+class StorePlace(models.Model):
+    @property
+    def holder(self):
+        try:
+            return self.stock
+        except ObjectDoesNotExist:
+            return self.staff
+
+    def __str__(self):
+        return str(self.holder)
+
+
+class Stock(StorePlace):
     department = models.CharField(
         verbose_name='структурное подразделение',
         max_length=30,
@@ -43,7 +54,7 @@ class Stock(models.Model):
         return self.department
 
 
-class Staff(models.Model):
+class Staff(StorePlace):
     surname = models.CharField(verbose_name='фамилия', max_length=30)
     forename = models.CharField(verbose_name='имя', max_length=20)
     patronymic = models.CharField(verbose_name='отчество', max_length=30, blank=True, null=True)
@@ -75,14 +86,17 @@ class Goods(models.Model):
         related_name='+',
         on_delete=models.CASCADE,
     )
-    store_place_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    store_place_id = models.PositiveIntegerField()
-    store_place = GenericForeignKey('store_place_type', 'store_place_id')
+    store_place = models.ForeignKey(
+        StorePlace,
+        verbose_name='место хранения',
+        related_name='goods',
+        on_delete=models.CASCADE,
+    )
 
     class Meta:
         verbose_name = 'ТМЦ'
         verbose_name_plural = 'ТМЦ'
-        unique_together = ('name', 'store_place_type', 'store_place_id')
+        unique_together = ('name', 'store_place')
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.store_place)
@@ -134,18 +148,17 @@ class Transfer(models.Model):
         # Берем первый из привязанных ТМЦ, так как в перемещении должен быть хотя бы один ТМЦ
         # и все ТМЦ в перемещении имеют одинаковое место отправления и получения
         transferred_goods = self.goods.all()[0]
+        sender_goods = transferred_goods.sender_goods
+        recepient_goods = transferred_goods.recepient_goods
 
-        if not transferred_goods.sender_goods:
+        if not sender_goods:
             transfer_type = 'INCOME'
-        elif not transferred_goods.recepient_goods:
+        elif not recepient_goods:
             transfer_type = 'WRITE-OFF'
         else:
-            sender_model_name = transferred_goods.sender_goods.store_place_type.model
-            recepient_model_name = transferred_goods.recepient_goods.store_place_type.model
-
-            if sender_model_name == 'staff':
+            if isinstance(sender_goods.holder, Staff):
                 transfer_type = 'RETURN'
-            elif recepient_model_name == 'staff':
+            elif isinstance(recepient_goods.holder, Staff):
                 transfer_type = 'SUPPLY'
             else:
                 transfer_type = 'TRANSFER'
@@ -157,8 +170,8 @@ class Transfer(models.Model):
         tg = self.goods.all()[0]
 
         return (
-            tg.sender_goods.store_place if tg.sender_goods else None,
-            tg.recepient_goods.store_place if tg.recepient_goods else None,
+            tg.sender_goods.holder if tg.sender_goods else None,
+            tg.recepient_goods.holder if tg.recepient_goods else None,
         )
 
     def get_transfer_type_str(self):

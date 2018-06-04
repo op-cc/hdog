@@ -6,6 +6,8 @@ from .models import (
     Measure,
     Staff,
     Stock,
+    Transfer,
+    TransferedGoods,
 )
 
 
@@ -31,4 +33,19 @@ class InventoryNumbersInline(admin.StackedInline):
 class GoodsAdmin(admin.ModelAdmin):
     inlines = [
         InventoryNumbersInline,
+    ]
+
+
+class TransferedGoodsInline(admin.StackedInline):
+    model = TransferedGoods
+    extra = 1
+    inlines = [
+        InventoryNumbersInline,
+    ]
+
+
+@admin.register(Transfer)
+class TransferAdmin(admin.ModelAdmin):
+    inlines = [
+        TransferedGoodsInline,
     ]

@@ -96,6 +96,10 @@ class Goods(models.Model):
         on_delete=models.CASCADE,
     )
 
+    @property
+    def holder(self):
+        return self.store_place.holder
+
     class Meta:
         verbose_name = 'ТМЦ'
         verbose_name_plural = 'ТМЦ'

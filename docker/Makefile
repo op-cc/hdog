@@ -11,3 +11,4 @@ up:
 
 dev: build up
 	$(dc) exec hdog-python python manage.py migrate
+	$(dc) exec hdog-python python manage.py loaddata admin_user

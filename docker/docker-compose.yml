@@ -2,12 +2,6 @@ version: '2'
 
 services:
 
-  hdog-source:
-    image: busybox
-    container_name: hdog-source
-    volumes:
-      - ./../:$SRC_DIR
-
   hdog-python:
     build:
       context: ..
@@ -27,8 +21,8 @@ services:
       - hdog-backend
     ports:
       - '$VIRTUAL_HOST_EXPOSE_PORT:$VIRTUAL_HOST_PORT'
-    volumes_from:
-      - hdog-source
+    volumes:
+      - ./../:$SRC_DIR
     command: python manage.py runserver 0.0.0.0:$VIRTUAL_HOST_PORT
 
   hdog-db:

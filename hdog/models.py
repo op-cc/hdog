@@ -115,6 +115,8 @@ class InventoryNumber(models.Model):
         Goods,
         verbose_name='ТМЦ',
         related_name='inv_numbers',
+        blank=True,
+        null=True,
         on_delete=models.CASCADE,
     )
 
@@ -256,3 +258,20 @@ class TransferedGoods(models.Model):
 
     def get_goods_unit(self):
         return self._get_goods_attribute('unit')
+
+    def save(self, *args, **kwargs):
+        new_transfer = False if self.pk else True
+        super().save(*args, **kwargs)
+
+        if new_transfer:
+            if self.sender_goods:
+                self.sender_goods.quantity -= self.quantity
+                self.sender_goods.save()
+            if self.recepient_goods:
+                self.recepient_goods.quantity += self.quantity
+                self.recepient_goods.save()
+
+            for inv_number in self.inv_numbers.all():
+                goods_for_inv_number = self.recepient_goods if self.recepient_goods else None
+                inv_number.supply = goods_for_inv_number
+                inv_number.save()

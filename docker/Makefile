@@ -1,4 +1,3 @@
-SLEEP_TIMER=5
 dc=docker-compose
 
 migrate:
@@ -8,10 +7,8 @@ build:
 	$(dc) build
 
 up:
-	$(dc) up -d hdog-db
-	sleep $(SLEEP_TIMER)
-	$(dc) up -d hdog-python
+	$(dc) up -d
 
 dev: build up
-	sleep $(SLEEP_TIMER)
 	$(dc) exec hdog-python python manage.py migrate
+	$(dc) exec hdog-python python manage.py loaddata admin_user

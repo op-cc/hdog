@@ -236,7 +236,7 @@ class TransferedGoods(models.Model):
     def __str__(self):
         return '{quantity} {measure} {name} [{transfer_info}]'.format(**dict(
             quantity=self.quantity,
-            measure=self.get_goods_measure().national_symbol,
+            measure=self.get_goods_unit().national_symbol,
             name=self.get_goods_name(),
             transfer_info=self.transfer,
         ))
@@ -254,5 +254,5 @@ class TransferedGoods(models.Model):
     def get_goods_name(self):
         return self._get_goods_attribute('name')
 
-    def get_goods_measure(self):
-        return self._get_goods_attribute('measure')
+    def get_goods_unit(self):
+        return self._get_goods_attribute('unit')

@@ -270,8 +270,3 @@ class TransferedGoods(models.Model):
             if self.recepient_goods:
                 self.recepient_goods.quantity += self.quantity
                 self.recepient_goods.save()
-
-            for inv_number in self.inv_numbers.all():
-                goods_for_inv_number = self.recepient_goods if self.recepient_goods else None
-                inv_number.supply = goods_for_inv_number
-                inv_number.save()

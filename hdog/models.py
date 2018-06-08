@@ -1,7 +1,9 @@
 from datetime import date
+from typing import List
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from django.db.models import QuerySet
 
 from categories.models import Category
 
@@ -271,5 +273,16 @@ class TransferedGoods(models.Model):
                 self.recepient_goods.quantity += self.quantity
                 self.recepient_goods.save()
 
-    def create(**kwargs):
-        pass
+    def create(transfer: Transfer, goods_name: str, price: int, quantity: int,
+               sender: StorePlace = None, recepient: StorePlace = None,
+               inv_numbers: List[int] = None, inv_numbers_qs: QuerySet = None,
+               generate_inv_numbers: bool = False,
+               ):
+        if quantity <= 0:
+            raise ValueError('Количество перемещаемых ТМЦ должно быть больше нуля')
+        if price <= 0:
+            raise ValueError('Цена должна быть положительным числом')
+        if not sender and not recepient:
+            raise ValueError('Укажите отправителя и/или получателя')
+        if not sender and type(recepient.holder) == Staff:
+            raise ValueError('Нельзя оформить поступление на сотрудника')

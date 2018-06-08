@@ -270,3 +270,6 @@ class TransferedGoods(models.Model):
             if self.recepient_goods:
                 self.recepient_goods.quantity += self.quantity
                 self.recepient_goods.save()
+
+    def create(**kwargs):
+        pass

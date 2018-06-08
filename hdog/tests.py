@@ -51,7 +51,6 @@ class TransferTestCase(TestCase):
         base_create_args = {
             'transfer': income,
             'recepient': cc,
-            'comment': income.comment
         }
 
         gs_base_args = {
@@ -148,7 +147,6 @@ class TransferTestCase(TestCase):
         base_create_args = {
             'transfer': second_income,
             'recepient': cc,
-            'comment': second_income.comment
         }
 
         gs_base_args = {
@@ -168,12 +166,12 @@ class TransferTestCase(TestCase):
         }
         gs_used_inv_numbers = {
             **gs_base_args,
-            'inv_numbers': grandstream_cc.inv_numbers.all()[:self.gs_second_income_count]
+            'inv_numbers_qs': grandstream_cc.inv_numbers.all()[:self.gs_second_income_count]
         }
 
         screws_base_args = {
             **base_create_args,
-            'goods': 'Шурупы',
+            'goods_name': 'Шурупы',
             'price': 3,
             'quantity': self.screws_second_income_count,
         }

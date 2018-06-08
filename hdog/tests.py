@@ -133,3 +133,100 @@ class TransferTestCase(TestCase):
         self.assertEqual(grandstream_cc.inv_numbers.count(), self.gs_first_income_count)
         self.assertEqual(screws_cc.quantity, self.screws_first_income_count)
         self.assertEqual(screws_cc.inv_numbers.count(), self.screws_first_income_count)
+
+    def test_020_secondIncome(self):
+        second_income = Transfer.objects.get(number=2, comment='second income')
+        cc = Stock.objects.get(code=770).storeplace_ptr
+        grandstream_cc = Goods.objects.get(
+            name='Grandstream GXP1615',
+            store_place=cc,
+        )
+
+        """
+        Инициализация аргументов
+        """
+        base_create_args = {
+            'transfer': second_income,
+            'recepient': cc,
+            'comment': second_income.comment
+        }
+
+        gs_base_args = {
+            **base_create_args,
+            'goods_name': 'Grandstream GXP1615',
+            'price': 11990,
+            'quantity': self.gs_second_income_count,
+            'inv_numbers': self.gs_second_income_inv_numbers,
+        }
+        gs_invalid_inv_numbers = {
+            **gs_base_args,
+            'inv_numbers': [self.gs_second_income_inv_numbers[0]]
+        }
+        gs_no_inv_numbers = {
+            **gs_base_args,
+            'inv_numbers': None,
+        }
+        gs_used_inv_numbers = {
+            **gs_base_args,
+            'inv_numbers': grandstream_cc.inv_numbers.all()[:self.gs_second_income_count]
+        }
+
+        screws_base_args = {
+            **base_create_args,
+            'goods': 'Шурупы',
+            'price': 3,
+            'quantity': self.screws_second_income_count,
+        }
+        screws_with_inv_numbers = {
+            **screws_base_args,
+            'inv_numbers': self.screws_second_income_inv_numbers,
+        }
+
+        """
+        Проверка исключений
+        """
+        self.assertRaisesRegex(
+            ValueError,
+            'Количество инвентарных номеров должно совпадать с количеством перемещаемых ТМЦ',
+            TransferedGoods.create,
+            **gs_invalid_inv_numbers,
+        )
+        self.assertRaisesRegex(
+            ValueError,
+            'Укажите инвентарные номера',
+            TransferedGoods.create,
+            **gs_no_inv_numbers,
+        )
+        self.assertRaisesRegex(
+            ValueError,
+            'Указанные инвентарные номера уже заняты',
+            TransferedGoods.create,
+            **gs_used_inv_numbers,
+        )
+
+        self.assertRaisesRegex(
+            ValueError,
+            'Данному ТМЦ ранее не присваивались инвентарные номера',
+            TransferedGoods.create,
+            **screws_with_inv_numbers,
+        )
+
+        """
+        Проверка создания поступления
+        """
+        TransferedGoods.create(**gs_base_args)
+        TransferedGoods.create(**screws_base_args)
+
+        grandstream_cc.refresh_from_db()
+        screws_cc = Goods.objects.get(
+            name='Шурупы',
+            store_place=cc,
+        )
+
+        gs_total_count = self.gs_first_income_count + self.gs_second_income_count
+        screws_total_count = self.screws_first_income_count + self.screws_second_income_count
+
+        self.assertEqual(grandstream_cc.quantity, gs_total_count)
+        self.assertEqual(grandstream_cc.inv_numbers.count(), gs_total_count)
+        self.assertEqual(screws_cc.quantity, screws_total_count)
+        self.assertEqual(screws_cc.inv_numbers.count(), screws_total_count)

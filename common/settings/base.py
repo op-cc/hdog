@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'categories',
     'categories.editor',
     'hdog.apps.HDogConfig',
+    'common',
 ]
 
 MIDDLEWARE = [
@@ -52,7 +53,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'hdog.urls'
+ROOT_URLCONF = 'common.urls'
 
 TEMPLATES = [
     {

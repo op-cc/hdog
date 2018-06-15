@@ -1,9 +1,10 @@
 from datetime import date
-from typing import List
+from typing import List, Tuple
 
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from django.db.models import QuerySet
+from django.db.models import Max, Q, QuerySet
 
 from categories.models import Category
 
@@ -84,7 +85,7 @@ class Goods(models.Model):
         on_delete=models.CASCADE,
     )
     name = models.CharField(verbose_name='наименование', max_length=150)
-    quantity = models.PositiveIntegerField(verbose_name='количество')
+    quantity = models.PositiveIntegerField(verbose_name='количество', default=0)
     unit = models.ForeignKey(
         Measure,
         verbose_name='единица измерения',
@@ -128,6 +129,22 @@ class InventoryNumber(models.Model):
 
     def __str__(self):
         return str(self.number)
+
+    def generate(quantity: int) -> QuerySet:
+        if quantity <= 0:
+            raise ValueError('Количество генерируемых инвентарных номеров должно быть больше нуля')
+
+        start_number = settings.BASE_INV_NUMBER
+
+        if InventoryNumber.objects.all():
+            max_number = InventoryNumber.objects.all().aggregate(Max('number'))
+            start_number = max_number['number__max'] + 1
+
+        generated_range = range(start_number, start_number + quantity)
+        for number in generated_range:
+            InventoryNumber.objects.create(number=number)
+
+        return InventoryNumber.objects.filter(number__in=generated_range)
 
 
 class Transfer(models.Model):
@@ -261,23 +278,8 @@ class TransferedGoods(models.Model):
     def get_goods_unit(self):
         return self._get_goods_attribute('unit')
 
-    def save(self, *args, **kwargs):
-        new_transfer = False if self.pk else True
-        super().save(*args, **kwargs)
-
-        if new_transfer:
-            if self.sender_goods:
-                self.sender_goods.quantity -= self.quantity
-                self.sender_goods.save()
-            if self.recepient_goods:
-                self.recepient_goods.quantity += self.quantity
-                self.recepient_goods.save()
-
-    def create(transfer: Transfer, goods_name: str, price: int, quantity: int,
-               sender: StorePlace = None, recepient: StorePlace = None,
-               inv_numbers: List[int] = None, inv_numbers_qs: QuerySet = None,
-               generate_inv_numbers: bool = False,
-               ):
+    def _transferBaseChecks(sender: StorePlace, recepient: StorePlace,
+                            quantity: int, price: int):
         if quantity <= 0:
             raise ValueError('Количество перемещаемых ТМЦ должно быть больше нуля')
         if price <= 0:
@@ -286,3 +288,153 @@ class TransferedGoods(models.Model):
             raise ValueError('Укажите отправителя и/или получателя')
         if not sender and type(recepient.holder) == Staff:
             raise ValueError('Нельзя оформить поступление на сотрудника')
+
+    def _clearInvNumbers(sender: StorePlace, recepient: StorePlace,
+                         goods_name: str, sender_goods: Goods, recepient_goods: Goods,
+                         quantity: int, inv_numbers: List[int], inv_numbers_qs: QuerySet,
+                         generate_inv_numbers: bool) -> QuerySet:
+        """
+        Функция возвращает набор перемещаемых инвентарных номеров
+        """
+        if generate_inv_numbers and (inv_numbers or inv_numbers_qs):
+            raise RuntimeError('Нельзя одновременно использовать заданные '
+                               'инвентарные номера и сгенерированные'
+                               )
+
+        result_inv_numbers_qs, inv_numbers_created = TransferedGoods._getInvNumbersQS(
+            generate_inv_numbers, quantity, inv_numbers, inv_numbers_qs
+        )
+
+        all_goods_with_target_name = Goods.objects.filter(name=goods_name)
+        inv_numbers_for_all_target_goods = InventoryNumber.objects.filter(
+            supply__in=all_goods_with_target_name
+        )
+
+        if not result_inv_numbers_qs and inv_numbers_for_all_target_goods.count() > 0:
+            raise ValueError('Укажите инвентарные номера')
+
+        try:
+            inv_numbers_count = len(result_inv_numbers_qs)
+
+            if not generate_inv_numbers and \
+               not inv_numbers_count == 0 and \
+               inv_numbers_count < quantity:
+                raise ValueError('Количество инвентарных номеров должно совпадать '
+                                 'с количеством перемещаемых ТМЦ'
+                                 )
+
+            if result_inv_numbers_qs and \
+               inv_numbers_for_all_target_goods.count() == 0 and \
+               recepient_goods.quantity > 0:
+                raise ValueError('Данному ТМЦ ранее не присваивались инвентарные номера')
+        except ValueError as e:
+            if inv_numbers_created:
+                result_inv_numbers_qs.delete()
+            raise e
+
+        if not sender and not inv_numbers_created and result_inv_numbers_qs:
+            if InventoryNumber.objects.filter(pk__in=result_inv_numbers_qs):
+                raise ValueError('Указанные инвентарные номера уже заняты')
+
+        if sender and result_inv_numbers_qs:
+            matching_inv_numbers_qs = InventoryNumber.objects.filter(
+                Q(supply=sender_goods) &
+                Q(pk__in=result_inv_numbers_qs)
+            ).count()
+
+            if matching_inv_numbers_qs.count() != result_inv_numbers_qs.count():
+                raise ValueError('Указанные инвентарные номера не привязаны к ТМЦ отправителя')
+
+        return result_inv_numbers_qs
+
+    def _getInvNumbersQS(generate_inv_numbers: bool, quantity: int, inv_numbers: List[int],
+                         inv_numbers_qs: QuerySet) -> Tuple[QuerySet, bool]:
+        result = []
+        res_created = False
+
+        if generate_inv_numbers:
+            result = InventoryNumber.generate(quantity)
+            res_created = True
+        elif inv_numbers:
+            result = InventoryNumber.objects.filter(number__in=inv_numbers)
+            if result.count() == 0:
+                for number in inv_numbers:
+                    InventoryNumber.objects.create(number=number)
+
+                res_created = True
+            elif result.count() < len(inv_numbers):
+                raise ValueError('Указанные инвентарные номера не существуют')
+        elif inv_numbers_qs:
+            result = inv_numbers_qs
+
+        return result, res_created
+
+    def create(transfer: Transfer, goods_name: str, price: int, quantity: int,
+               sender: StorePlace = None, recepient: StorePlace = None,
+               inv_numbers: List[int] = None, inv_numbers_qs: QuerySet = None,
+               generate_inv_numbers: bool = False, category: Category = None,
+               measure: Measure = None,
+               ) -> 'TransferedGoods':
+        """
+        Создание пункта перемещения после выполнения всех проверок на ошибки
+        Возможные исключения: ObjectDoesNotExist, RuntimeError, ValueError
+        """
+        sender_goods = None
+        recepient_goods = None
+        if recepient:
+            recepient_goods, _ = Goods.objects.get_or_create(
+                name=goods_name,
+                store_place=recepient,
+                category=category,
+                unit=measure,
+            )
+        if sender:
+            try:
+                sender_goods = Goods.objects.get(name=goods_name, store_place=sender)
+
+                if sender_goods.quantity < quantity:
+                    raise ValueError('У отправителя недостаточно ТМЦ для выполнения операции')
+            except ObjectDoesNotExist as e:
+                raise e('У отправителя нет этого ТМЦ')
+
+            if generate_inv_numbers:
+                raise ValueError('Нельзя генерировать инвентарные номера для ТМЦ, '
+                                 'которые уже есть в базе данных')
+
+        TransferedGoods._transferBaseChecks(sender, recepient_goods, quantity, price)
+
+        clear_inv_numbers_qs = TransferedGoods._clearInvNumbers(
+            sender,
+            recepient,
+            goods_name,
+            sender_goods,
+            recepient_goods,
+            quantity,
+            inv_numbers,
+            inv_numbers_qs,
+            generate_inv_numbers,
+        )
+
+        """
+        Выполнение операции
+        """
+        transfered_goods = TransferedGoods.objects.create(
+            transfer=transfer,
+            sender_goods=sender_goods,
+            recepient_goods=recepient_goods,
+            quantity=quantity,
+            price=price,
+        )
+
+        if sender:
+            sender_goods.quantity -= quantity
+            sender_goods.save()
+        if recepient:
+            recepient_goods.quantity += quantity
+            recepient_goods.save()
+
+            if clear_inv_numbers_qs:
+                clear_inv_numbers_qs.update(supply=recepient_goods)
+                transfered_goods.inv_numbers.set(list(clear_inv_numbers_qs))
+
+        return transfered_goods

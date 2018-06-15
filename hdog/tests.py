@@ -1,7 +1,9 @@
 from django.test import TestCase
 
 from .models import (
+    Category,
     Goods,
+    Measure,
     Staff,
     Stock,
     Transfer,
@@ -40,10 +42,18 @@ class TransferTestCase(TestCase):
         Transfer.objects.create(number=6, comment='return')
         Transfer.objects.create(number=7, comment='write-off')
 
-    def test_010_firstIncome(self):
+    def testIncomes(self):
+        # TODO: дописать проверку исключений, чтобы охватить все возможные
+        self._test_firstIncome()
+        self._test_secondIncome()
+
+    def _test_firstIncome(self):
         income = Transfer.objects.get(number=1, comment='income')
         cc = Stock.objects.get(code=770).storeplace_ptr
         ivanov = Staff.objects.get(surname='Иванов').storeplace_ptr
+        consumables_category = Category.objects.get(name='Расходные материалы')
+        ip_phones_category = Category.objects.get(name='IP')
+        piece = Measure.objects.get(name='Штука')
 
         """
         Инициализация аргументов
@@ -59,6 +69,8 @@ class TransferTestCase(TestCase):
             'price': 11990,
             'quantity': self.gs_first_income_count,
             'generate_inv_numbers': True,
+            'category': ip_phones_category,
+            'measure': piece,
         }
         gs_invalid_quantity_args = {
             **gs_base_args,
@@ -78,6 +90,8 @@ class TransferTestCase(TestCase):
             'goods_name': 'Шурупы',
             'price': 3,
             'quantity': self.screws_first_income_count,
+            'category': consumables_category,
+            'measure': piece,
         }
         screws_invalid_recepient_args = {
             **screws_base_args,
@@ -116,8 +130,8 @@ class TransferTestCase(TestCase):
         """
         Проверка создания поступления
         """
-        TransferedGoods.create(**gs_base_args)
-        TransferedGoods.create(**screws_base_args)
+        gs_transfer = TransferedGoods.create(**gs_base_args)
+        screws_transfer = TransferedGoods.create(**screws_base_args)
 
         grandstream_cc = Goods.objects.get(
             name='Grandstream GXP1615',
@@ -131,15 +145,33 @@ class TransferTestCase(TestCase):
         self.assertEqual(grandstream_cc.quantity, self.gs_first_income_count)
         self.assertEqual(grandstream_cc.inv_numbers.count(), self.gs_first_income_count)
         self.assertEqual(screws_cc.quantity, self.screws_first_income_count)
-        self.assertEqual(screws_cc.inv_numbers.count(), self.screws_first_income_count)
+        self.assertEqual(screws_cc.inv_numbers.count(), 0)
+        self.assertEqual(income.goods.count(), 2)
 
-    def test_020_secondIncome(self):
+        self.assertEqual(gs_transfer.transfer, income)
+        self.assertEqual(gs_transfer.sender_goods, None)
+        self.assertEqual(gs_transfer.recepient_goods, grandstream_cc)
+        self.assertEqual(gs_transfer.quantity, self.gs_first_income_count)
+        self.assertEqual(gs_transfer.price, 11990)
+        self.assertEqual(gs_transfer.inv_numbers.count(), self.gs_first_income_count)
+
+        self.assertEqual(screws_transfer.transfer, income)
+        self.assertEqual(screws_transfer.sender_goods, None)
+        self.assertEqual(screws_transfer.recepient_goods, screws_cc)
+        self.assertEqual(screws_transfer.quantity, self.screws_first_income_count)
+        self.assertEqual(screws_transfer.price, 3)
+        self.assertEqual(screws_transfer.inv_numbers.count(), 0)
+
+    def _test_secondIncome(self):
         second_income = Transfer.objects.get(number=2, comment='second income')
         cc = Stock.objects.get(code=770).storeplace_ptr
         grandstream_cc = Goods.objects.get(
             name='Grandstream GXP1615',
             store_place=cc,
         )
+        consumables_category = Category.objects.get(name='Расходные материалы')
+        ip_phones_category = Category.objects.get(name='IP')
+        piece = Measure.objects.get(name='Штука')
 
         """
         Инициализация аргументов
@@ -155,6 +187,8 @@ class TransferTestCase(TestCase):
             'price': 11990,
             'quantity': self.gs_second_income_count,
             'inv_numbers': self.gs_second_income_inv_numbers,
+            'category': ip_phones_category,
+            'measure': piece,
         }
         gs_invalid_inv_numbers = {
             **gs_base_args,
@@ -166,6 +200,7 @@ class TransferTestCase(TestCase):
         }
         gs_used_inv_numbers = {
             **gs_base_args,
+            'inv_numbers': None,
             'inv_numbers_qs': grandstream_cc.inv_numbers.all()[:self.gs_second_income_count]
         }
 
@@ -174,6 +209,8 @@ class TransferTestCase(TestCase):
             'goods_name': 'Шурупы',
             'price': 3,
             'quantity': self.screws_second_income_count,
+            'category': consumables_category,
+            'measure': piece,
         }
         screws_with_inv_numbers = {
             **screws_base_args,
@@ -212,8 +249,8 @@ class TransferTestCase(TestCase):
         """
         Проверка создания поступления
         """
-        TransferedGoods.create(**gs_base_args)
-        TransferedGoods.create(**screws_base_args)
+        gs_transfer = TransferedGoods.create(**gs_base_args)
+        screws_transfer = TransferedGoods.create(**screws_base_args)
 
         grandstream_cc.refresh_from_db()
         screws_cc = Goods.objects.get(
@@ -227,4 +264,19 @@ class TransferTestCase(TestCase):
         self.assertEqual(grandstream_cc.quantity, gs_total_count)
         self.assertEqual(grandstream_cc.inv_numbers.count(), gs_total_count)
         self.assertEqual(screws_cc.quantity, screws_total_count)
-        self.assertEqual(screws_cc.inv_numbers.count(), screws_total_count)
+        self.assertEqual(screws_cc.inv_numbers.count(), 0)
+        self.assertEqual(second_income.goods.count(), 2)
+
+        self.assertEqual(gs_transfer.transfer, second_income)
+        self.assertEqual(gs_transfer.sender_goods, None)
+        self.assertEqual(gs_transfer.recepient_goods, grandstream_cc)
+        self.assertEqual(gs_transfer.quantity, self.gs_second_income_count)
+        self.assertEqual(gs_transfer.price, 11990)
+        self.assertEqual(gs_transfer.inv_numbers.count(), self.gs_second_income_count)
+
+        self.assertEqual(screws_transfer.transfer, second_income)
+        self.assertEqual(screws_transfer.sender_goods, None)
+        self.assertEqual(screws_transfer.recepient_goods, screws_cc)
+        self.assertEqual(screws_transfer.quantity, self.screws_second_income_count)
+        self.assertEqual(screws_transfer.price, 3)
+        self.assertEqual(screws_transfer.inv_numbers.count(), 0)

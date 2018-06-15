@@ -126,3 +126,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 SITE_ID = 1
+
+BASE_INV_NUMBER = 770000

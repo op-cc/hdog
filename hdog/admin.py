@@ -16,12 +16,24 @@ class MeasureAdmin(admin.ModelAdmin):
     list_display = ('name', 'national_symbol', 'key')
 
 
-admin.site.register(Stock)
+class GoodsInline(admin.StackedInline):
+    model = Goods
+    extra = 0
+
+
+@admin.register(Stock)
+class StockAdmin(admin.ModelAdmin):
+    inlines = [
+        GoodsInline,
+    ]
 
 
 @admin.register(Staff)
 class StaffAdmin(admin.ModelAdmin):
     list_display = ('surname', 'forename', 'patronymic')
+    inlines = [
+        GoodsInline,
+    ]
 
 
 class InventoryNumbersInline(admin.StackedInline):

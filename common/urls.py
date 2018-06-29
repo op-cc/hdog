@@ -17,16 +17,20 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path, re_path, include
 
-import hdog.urls
+import common.views as views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include(hdog.urls)),
+    path('', views.redirect_to_stock),
+    path('store/', views.redirect_to_stock),
+    path('store/<int:store_place_pk>/', views.stock_overview, name='stock_overview'),
 ]
 
 if settings.DEBUG:
     import debug_toolbar
+    from django.conf.urls.static import static
 
     urlpatterns = [
         re_path(r'^__debug__/', include(debug_toolbar.urls)),
-    ] + urlpatterns
+    ] + urlpatterns \
+      + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

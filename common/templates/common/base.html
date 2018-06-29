@@ -1,0 +1,43 @@
+<!doctype html>
+{% load static %}
+
+<html class="no-js" lang="ru" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{% static 'common/css/foundation.min.css' %}">
+    <link rel="stylesheet" href="{% static 'common/css/app.css' %}">
+  </head>
+  <body>
+    <div class="grid-container base-page-containter">
+      <div class="grid-y grid-frame">
+        <div class="grid-x grid-padding-x stretched-by-y-grid">
+          <div class="grid-y grid-padding-y">
+            {% include "common/menu.html" %}
+          </div>
+          <div class="cell auto">
+            <div class="grid-y grid-frame grid-padding-y">
+              <div class="cell shrink">
+                <h4>{{ title }}</h4>
+              </div>
+              <div class="cell cell-block-y cell-block-x auto">
+                {% block content %}
+                  
+                {% endblock content %}
+              </div>
+            </div>
+          </div>
+          {% block additional_content %}
+            
+          {% endblock additional_content %}
+        </div>
+      </div>
+    </div>
+    <script src="{% static 'common/js/vendor/jquery.min.js' %}"></script>
+    <script src="{% static 'common/js/vendor/what-input.min.js' %}"></script>
+    <script src="{% static 'common/js/vendor/foundation.min.js' %}"></script>
+    <script src="{% static 'common/js/app.js' %}"></script>
+  </body>
+</html>

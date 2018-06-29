@@ -1,0 +1,42 @@
+{% extends "common/base.html" %}
+
+{% block content %}
+  {% include "hdog/goods_table.html" %}
+{% endblock content %}
+
+{% block additional_content %}
+  {% if categories_set %}
+  <div class="grid-y grid-padding-y filters-column">
+    <div class="cell shrink">
+      <h4>Фильтры</h4>
+    </div>
+    <div class="cell auto">
+      <form action="list_url">
+        <fieldset class="fieldset filters-fieldset">
+          <legend>Категория</legend>
+          <grid-y>
+            {% for category in categories_set %}
+              <div class="cell">
+                <input type="checkbox" name="category" value="{{ category.slug }}" id="{{ category.slug }}"><label for="{{ category.slug }}">{{ category }}</label>
+              </div>
+            {% endfor %}
+          </grid-y>
+        </fieldset>
+        <fieldset class="fieldset filters-fieldset">
+          <legend>Наличие</legend>
+          <grid-y>
+            <div class="cell">
+              <input type="radio" name="in_stock" value="1" id="in_stock" checked><label for="in_stock">В наличии</label>
+            </div>
+            <div class="cell">
+              <input type="radio" name="in_stock" value="0" id="out_of_stock"><label for="out_of_stock">Отсутствует</label>
+            </div>
+          </grid-y>
+        </fieldset>
+        <input type="submit" class="button filters-button" value="Применить">
+        <input type="reset" class="secondary button filters-button" value="Сбросить">
+      </form>
+    </div>
+  </div>
+  {% endif %}
+{% endblock additional_content %}

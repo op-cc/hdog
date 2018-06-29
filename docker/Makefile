@@ -21,6 +21,7 @@ clean-data:
 	$(dc) up -d hdog-python
 	$(dc) exec hdog-python python manage.py migrate
 	$(dc) exec hdog-python python manage.py loaddata admin_user
+	$(dc) exec hdog-python python manage.py loaddata menu
 
 tests:
 	$(dc) up -d

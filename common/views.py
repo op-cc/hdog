@@ -21,6 +21,7 @@ def stock_overview(request, store_place_pk):
     template = 'common/goods_table.html'
 
     get_only_in_stock = True if request.GET.get('in_stock', '1') == '1' else False
+    selected_categories = request.GET.getlist('category')
 
     store_place = StorePlace.objects.get(pk=store_place_pk)
     goods = Goods.objects.filter(store_place__pk=store_place_pk)
@@ -30,12 +31,17 @@ def stock_overview(request, store_place_pk):
     else:
         goods = goods.filter(quantity=0)
 
+    if selected_categories:
+        goods = goods.filter(category__slug__in=selected_categories)
+
     context = {
         'store_place_pk': store_place_pk,
         'goods_set': goods,
         'categories_set': Category.objects.filter(goods__store_place=store_place),
         'store_places': StorePlace.objects.all(),
         'title': 'Список ТМЦ',
+        'get_only_in_stock': get_only_in_stock,
+        'selected_categories': selected_categories,
     }
 
     return render(request, template, context=context)

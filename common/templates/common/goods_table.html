@@ -17,7 +17,7 @@
           <grid-y>
             {% for category in categories_set %}
               <div class="cell">
-                <input type="checkbox" name="category" value="{{ category.slug }}" id="{{ category.slug }}"><label for="{{ category.slug }}">{{ category }}</label>
+                <input type="checkbox" name="category" value="{{ category.slug }}" id="{{ category.slug }}" {% if category.slug in selected_categories %}checked{% endif %}><label for="{{ category.slug }}">{{ category }}</label>
               </div>
             {% endfor %}
           </grid-y>
@@ -26,10 +26,10 @@
           <legend>Наличие</legend>
           <grid-y>
             <div class="cell">
-              <input type="radio" name="in_stock" value="1" id="in_stock" checked><label for="in_stock">В наличии</label>
+              <input type="radio" name="in_stock" value="1" id="in_stock" {% if get_only_in_stock %}checked{% endif %}><label for="in_stock">В наличии</label>
             </div>
             <div class="cell">
-              <input type="radio" name="in_stock" value="0" id="out_of_stock"><label for="out_of_stock">Отсутствует</label>
+              <input type="radio" name="in_stock" value="0" id="out_of_stock" {% if not get_only_in_stock %}checked{% endif %}><label for="out_of_stock">Отсутствует</label>
             </div>
           </grid-y>
         </fieldset>

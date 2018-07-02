@@ -1,4 +1,3 @@
-from django.db.models import Q
 from django.shortcuts import render, redirect
 
 from categories.models import Category
@@ -21,11 +20,15 @@ def redirect_to_stock(request):
 def stock_overview(request, store_place_pk):
     template = 'common/goods_table.html'
 
+    get_only_in_stock = True if request.GET.get('in_stock', '1') == '1' else False
+
     store_place = StorePlace.objects.get(pk=store_place_pk)
-    goods = Goods.objects.filter(
-        Q(store_place__pk=store_place_pk) &
-        Q(quantity__gt=0)
-    )
+    goods = Goods.objects.filter(store_place__pk=store_place_pk)
+
+    if get_only_in_stock:
+        goods = goods.filter(quantity__gte=1)
+    else:
+        goods = goods.filter(quantity=0)
 
     context = {
         'store_place_pk': store_place_pk,

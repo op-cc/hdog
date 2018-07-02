@@ -1,0 +1,29 @@
+<div class="cell">
+  <select name="category{{ counter }}" id="idCategory{{ counter }}">
+    {% for category in categories_set %}
+      <option value="{{ category.slug }}">{{ category }}</option>
+    {% endfor %}
+  </select>
+</div>
+<div class="cell">
+  <input list="goods" name="goods{{ counter }}" placeholder="ТМЦ">
+  <datalist>
+    {% for goods in goods_set %}
+      <option value="{{ goods.pk }}">{{ goods }}</option>
+    {% endfor %}
+  </datalist>
+</div>
+<div class="cell">
+  <label for="quantity{{ counter }}">Количество:</label>
+  <input type="number" min="0" step="any" id="quantity{{ counter }}">
+</div>
+<div class="cell">
+  <select name="measure{{ counter }}" id="idMeasure{{ counter }}">
+    {% for measure in measure_set %}
+      <option value="{{ measure.pk }}">{{ measure }}</option>
+    {% endfor %}
+  </select>
+</div>
+<div class="cell">
+  <input type="text" placeholder="Инвентарные номера">
+</div>

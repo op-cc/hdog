@@ -24,6 +24,7 @@ urlpatterns = [
     path('', views.redirect_to_stock),
     path('store/', views.redirect_to_stock),
     path('store/<int:store_place_pk>/', views.stock_overview, name='stock_overview'),
+    path('register-income/', views.register_income, name='register_income')
 ]
 
 if settings.DEBUG:

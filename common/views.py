@@ -56,3 +56,13 @@ def stock_overview(request, store_place_pk):
     }
 
     return render(request, template, context=context)
+
+
+def register_income(request):
+    template = 'common/register_income.html'
+
+    context = {
+        'title': 'Поступление'
+    }
+
+    return render(request, template, context=context)

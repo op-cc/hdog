@@ -1,0 +1,24 @@
+.user_name {
+  color: gray;
+  margin-bottom: -1.5em;
+}
+
+.base-page-containter {
+  max-width: 100%;
+}
+
+.stretched-by-y-grid {
+  height: 100%;
+}
+
+.filters-column {
+  max-width: 25em;
+}
+
+.filters-fieldset {
+  margin-top: -0.75em;
+}
+
+.filters-button {
+  width: 9em;
+}

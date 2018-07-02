@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'categories',
     'categories.editor',
+    'menu',
     'hdog.apps.HDogConfig',
+    'common',
 ]
 
 MIDDLEWARE = [
@@ -52,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'hdog.urls'
+ROOT_URLCONF = 'common.urls'
 
 TEMPLATES = [
     {
@@ -122,6 +124,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
+
+STATIC_ROOT = 'static/'
 
 STATIC_URL = '/static/'
 

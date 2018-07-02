@@ -1,0 +1,50 @@
+{% extends "common/base.html" %}
+
+{% block content %}
+  {% include "hdog/goods_table.html" %}
+{% endblock content %}
+
+{% block additional_content %}
+  {% if categories_set %}
+  <div class="grid-y grid-padding-y filters-column">
+    <div class="cell shrink">
+      <h4>Фильтры</h4>
+    </div>
+    <div class="cell shrink">
+      <form name="filtersForm">
+        <fieldset class="fieldset filters-fieldset">
+          <legend>Категория</legend>
+          <grid-y>
+            {% for category in categories_set %}
+              <div class="cell">
+                <input type="checkbox" name="category" value="{{ category.slug }}" id="{{ category.slug }}" {% if category.slug in selected_categories %}checked{% endif %}><label for="{{ category.slug }}">{{ category }}</label>
+              </div>
+            {% endfor %}
+          </grid-y>
+        </fieldset>
+        <fieldset class="fieldset filters-fieldset">
+          <legend>Наличие</legend>
+          <grid-y>
+            <div class="cell">
+              <input type="radio" name="in_stock" value="1" id="in_stock" {% if get_only_in_stock %}checked{% endif %}><label for="in_stock">В наличии</label>
+            </div>
+            <div class="cell">
+              <input type="radio" name="in_stock" value="0" id="out_of_stock" {% if not get_only_in_stock %}checked{% endif %}><label for="out_of_stock">Отсутствует</label>
+            </div>
+          </grid-y>
+        </fieldset>
+        <input type="submit" class="button filters-button" value="Применить">
+        <input class="secondary button filters-button" onclick="resetGoodsFilter()" value="Сбросить">
+      </form>
+    </div>
+    <div class="cell cell-block-y auto">
+      <h4>Последние операции</h4>
+      {% for transfer in transfer_set %}
+        <p>{{ transfer }}</p>
+      {% empty %}
+        <p>Не зарегистрировано операций по складу</p>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+{% endblock additional_content %}

@@ -1,0 +1,25 @@
+{% if not goods_set %}
+  <p>Нет ни одного ТМЦ, удовлетворяющего выбранным условиям</p>
+{% else %}
+  <table>
+  <thead>
+    <tr>
+      <th>№</th>
+      <th>Категория</th>
+      <th>Наименование</th>
+      <th>Количество</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for goods in goods_set %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ goods.category }}</td>
+        <td>{{ goods.name }}</td>
+        <td>{{ goods.quantity }} {{ goods.measure.national_symbol }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+

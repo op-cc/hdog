@@ -1,0 +1,39 @@
+<div class="cell shrink">
+  <h4>Меню</h4>
+</div>
+<div class="cell auto">
+  <ul class="vertical menu align-left">{% load menubuilder %}{% menu sidebartopnav %}
+    {% for item in menuitems %}
+      <li {% if item.current %}class='active'{% endif %}>
+        <a href="{{ item.url }}" title="{{ item.title|escape }}">{{ item.title }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+
+<div class="cell shrink">
+  {% if store_places %}
+    <label>Место хранения</label>
+    <select onchange="changeStorePlace(this.value)">
+      {% for store_place in store_places %}
+        <option value="{{ store_place.pk }}" {% if store_place_pk == store_place.pk %}selected{% endif %}>{{ store_place }}</option>
+      {% endfor %}
+    </select>
+  {% else %}
+    <p><a href="{% url 'admin:hdog_stock_add' %}">Создать склад</a></p>
+    <p><a href="{% url 'admin:hdog_staff_add' %}">Добавить сотрудника</a></p>
+  {% endif %}
+</div>
+
+{% if request.user.is_authenticated %}
+  <div class="cell shrink user_name">
+    {{ request.user.last_name }} {{ request.user.first_name }}
+  </div>
+  <div class="cell shrink">
+    <a href="{% url 'admin:logout' %}?next={{ request.path }}">Выход</a>
+  </div>
+{% else %}
+  <div class="cell shrink">
+    <a href="{% url 'admin:login' %}?next={{ request.path }}">Войти</a>
+  </div>
+{% endif %}

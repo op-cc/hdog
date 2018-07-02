@@ -1,8 +1,13 @@
+from django.db.models import Q
 from django.shortcuts import render, redirect
 
 from categories.models import Category
 
-from hdog.models import Goods, StorePlace
+from hdog.models import (
+    Goods,
+    StorePlace,
+    Transfer,
+)
 
 
 def redirect_to_stock(request):
@@ -34,10 +39,16 @@ def stock_overview(request, store_place_pk):
     if selected_categories:
         goods = goods.filter(category__slug__in=selected_categories)
 
+    transfer_set = Transfer.objects.filter(
+        Q(goods__sender_goods__store_place=store_place)
+        | Q(goods__recepient_goods__store_place=store_place)
+    )[:10]
+
     context = {
         'store_place_pk': store_place_pk,
         'goods_set': goods,
         'categories_set': Category.objects.filter(goods__store_place=store_place),
+        'transfer_set': transfer_set,
         'store_places': StorePlace.objects.all(),
         'title': 'Список ТМЦ',
         'get_only_in_stock': get_only_in_stock,

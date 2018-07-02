@@ -10,7 +10,7 @@
     <div class="cell shrink">
       <h4>Фильтры</h4>
     </div>
-    <div class="cell auto">
+    <div class="cell shrink">
       <form name="filtersForm">
         <fieldset class="fieldset filters-fieldset">
           <legend>Категория</legend>
@@ -36,6 +36,14 @@
         <input type="submit" class="button filters-button" value="Применить">
         <input class="secondary button filters-button" onclick="resetGoodsFilter()" value="Сбросить">
       </form>
+    </div>
+    <div class="cell cell-block-y auto">
+      <h4>Последние операции</h4>
+      {% for transfer in transfer_set %}
+        <p>{{ transfer }}</p>
+      {% empty %}
+        <p>Не зарегистрировано операций по складу</p>
+      {% endfor %}
     </div>
   </div>
   {% endif %}

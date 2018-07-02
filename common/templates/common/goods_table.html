@@ -11,7 +11,7 @@
       <h4>Фильтры</h4>
     </div>
     <div class="cell auto">
-      <form>
+      <form name="filtersForm">
         <fieldset class="fieldset filters-fieldset">
           <legend>Категория</legend>
           <grid-y>
@@ -34,7 +34,7 @@
           </grid-y>
         </fieldset>
         <input type="submit" class="button filters-button" value="Применить">
-        <input type="reset" class="secondary button filters-button" value="Сбросить">
+        <input class="secondary button filters-button" onclick="resetGoodsFilter()" value="Сбросить">
       </form>
     </div>
   </div>

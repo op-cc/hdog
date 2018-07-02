@@ -14,3 +14,16 @@ function changeStorePlace(store_place_pk) {
         window.location.pathname = ('/store/' + store_place_pk)
     }
 }
+
+function resetGoodsFilter() {
+    checked_categories = $('input[type="checkbox"][name="category"]:checked')
+
+    for (i = 0; i < checked_categories.length; ++i) {
+        checked_categories[i].checked = false;
+    }
+
+    in_stock_radio = $('#in_stock')
+    in_stock_radio.click();
+
+    document.filtersForm.submit();
+}

@@ -1,4 +1,3 @@
-from django.db.models import Q
 from django.shortcuts import render, redirect
 
 from categories.models import Category
@@ -6,7 +5,6 @@ from categories.models import Category
 from hdog.models import (
     Goods,
     StorePlace,
-    Transfer,
 )
 
 
@@ -25,34 +23,53 @@ def redirect_to_stock(request):
 def stock_overview(request, store_place_pk):
     template = 'common/goods_table.html'
 
-    get_only_in_stock = True if request.GET.get('in_stock', '1') == '1' else False
+    get_only_in_stock = int(request.GET.get('in_stock', '1'))
     selected_categories = request.GET.getlist('category')
 
-    store_place = StorePlace.objects.get(pk=store_place_pk)
-    goods = Goods.objects.filter(store_place__pk=store_place_pk)
+    goods_name = request.GET.get('goods_name', None)
 
-    if get_only_in_stock:
-        goods = goods.filter(quantity__gte=1)
+    all_store_places = True if request.GET.get('all_store_places', 'false') == 'true' else False
+
+    if all_store_places:
+        store_places = StorePlace.objects.all()
+        display_store_in_table = True
     else:
+        store_places = StorePlace.objects.filter(pk=store_place_pk)
+        display_store_in_table = False
+
+    goods = Goods.objects.filter(store_place__in=store_places)
+
+    if get_only_in_stock == 1:
+        goods = goods.filter(quantity__gte=1)
+    elif get_only_in_stock == 0:
         goods = goods.filter(quantity=0)
+
+    if goods_name:
+        goods = goods.filter(name__icontains=goods_name)
 
     if selected_categories:
         goods = goods.filter(category__slug__in=selected_categories)
 
-    transfer_set = Transfer.objects.filter(
-        Q(goods__sender_goods__store_place=store_place)
-        | Q(goods__recepient_goods__store_place=store_place)
-    )[:10]
+    goods = goods.prefetch_related(
+        'category',
+        'unit',
+        'store_place',
+    )
+
+    categories_set = Category.objects.filter(
+        goods__store_place__pk__in=store_places).distinct()
 
     context = {
         'store_place_pk': store_place_pk,
         'goods_set': goods,
-        'categories_set': Category.objects.filter(goods__store_place=store_place),
-        'transfer_set': transfer_set,
-        'store_places': StorePlace.objects.all(),
+        'categories_set': categories_set,
+        'store_places': StorePlace.objects.all().prefetch_related('stock', 'staff'),
         'title': 'Список ТМЦ',
         'get_only_in_stock': get_only_in_stock,
         'selected_categories': selected_categories,
+        'goods_name': goods_name,
+        'all_store_places': all_store_places,
+        'display_store_in_table': display_store_in_table,
     }
 
     return render(request, template, context=context)

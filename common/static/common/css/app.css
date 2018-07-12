@@ -22,3 +22,11 @@
 .filters-button {
   width: 9em;
 }
+
+.using-all-vheight {
+  height: 100vh;
+}
+
+.add-content-title {
+  height: 73px;
+}

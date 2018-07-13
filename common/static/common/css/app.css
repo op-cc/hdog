@@ -40,3 +40,8 @@ td a.table-row-link {
   display: block;
   color: inherit;
 }
+
+.pagination-bar {
+  display: flex;
+  justify-content: center;
+}

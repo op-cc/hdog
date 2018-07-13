@@ -8,6 +8,24 @@
   {% include "hdog/goods_table.html" %}
 {% endblock content %}
 
+{% block bottom-content %}
+  {% if goods_page.has_other_pages %}
+  <div class="cell shrink pagination-bar">
+    <nav>
+      <ul class="pagination">
+        {% for page in paginator.page_range %}
+          {% if goods_page.number == page %}
+            <li class="current">{{ page }}</li>
+          {% else %}
+            <li><a href='?page={{ page }}'>{{ page }}</a></li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </nav>
+  </div>
+  {% endif %}
+{% endblock bottom-content %}
+
 {% block additional_content %}
   {% if categories_set %}
   <form name="filtersForm">

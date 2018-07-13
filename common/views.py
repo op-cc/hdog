@@ -75,7 +75,6 @@ def stock_overview(request, store_place_pk):
         'goods_name': goods_name,
         'all_store_places': all_store_places,
         'display_store_in_table': display_store_in_table,
-        'page': page,
         'paginator': paginator,
     }
 

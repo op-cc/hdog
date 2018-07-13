@@ -30,3 +30,8 @@
 .add-content-title {
   height: 73px;
 }
+
+.goods-row:hover {
+  background: lightblue;
+  cursor: pointer;
+}

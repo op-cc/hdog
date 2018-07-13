@@ -1,5 +1,9 @@
 {% extends "common/base.html" %}
 
+{% block body_parameters %}
+  onload="prepareGoodsTable()"
+{% endblock body_parameters %}
+
 {% block content %}
   {% include "hdog/goods_table.html" %}
 {% endblock content %}

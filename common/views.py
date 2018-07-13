@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
 
 from categories.models import Category
@@ -56,12 +57,16 @@ def stock_overview(request, store_place_pk):
         'store_place',
     )
 
+    page = int(request.GET.get('page', '1'))
+    paginator = Paginator(goods, 100)
+    goods_page = paginator.get_page(page)
+
     categories_set = Category.objects.filter(
         goods__store_place__pk__in=store_places).distinct()
 
     context = {
         'store_place_pk': store_place_pk,
-        'goods_set': goods,
+        'goods_page': goods_page,
         'categories_set': categories_set,
         'store_places': StorePlace.objects.all().prefetch_related('stock', 'staff'),
         'title': 'Список ТМЦ',
@@ -70,6 +75,8 @@ def stock_overview(request, store_place_pk):
         'goods_name': goods_name,
         'all_store_places': all_store_places,
         'display_store_in_table': display_store_in_table,
+        'page': page,
+        'paginator': paginator,
     }
 
     return render(request, template, context=context)

@@ -35,3 +35,8 @@
   background: lightblue;
   cursor: pointer;
 }
+
+td a.table-row-link {
+  display: block;
+  color: inherit;
+}

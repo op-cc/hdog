@@ -4,6 +4,7 @@
   <table>
   <thead>
     <tr>
+      <th style="display: none"></th>
       <th>№</th>
       {% if display_store_in_table %}
       <th>Место хранения</th>
@@ -17,13 +18,13 @@
     {% for goods in goods_set %}
       <tr class="goods-row">
         <td class='hidden-url' style="display: none;">{% url 'admin:hdog_goods_change' goods.id %}</td>
-        <td>{{ forloop.counter }}</td>
+        <td><a class='table-row-link' href="{% url 'admin:hdog_goods_change' goods.id %}">{{ forloop.counter }}</a></td>
         {% if display_store_in_table %}
-        <td>{{ goods.store_place }}</td>
+        <td><a class='table-row-link' href="{% url 'admin:hdog_goods_change' goods.id %}">{{ goods.store_place }}</a></td>
         {% endif %}
-        <td>{{ goods.category }}</td>
-        <td>{{ goods.name }}</td>
-        <td>{{ goods.quantity }} {{ goods.measure.national_symbol }}</td>
+        <td><a class='table-row-link' href="{% url 'admin:hdog_goods_change' goods.id %}">{{ goods.category }}</a></td>
+        <td><a class='table-row-link' href="{% url 'admin:hdog_goods_change' goods.id %}">{{ goods.name }}</a></td>
+        <td><a class='table-row-link' href="{% url 'admin:hdog_goods_change' goods.id %}">{{ goods.quantity }} {{ goods.measure.national_symbol }}</a></td>
       </tr>
     {% endfor %}
   </tbody>

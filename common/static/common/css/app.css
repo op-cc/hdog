@@ -45,3 +45,7 @@ td a.table-row-link {
   display: flex;
   justify-content: center;
 }
+
+html {
+  font-size: 14px;
+}

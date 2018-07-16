@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
 
@@ -58,7 +59,7 @@ def stock_overview(request, store_place_pk):
     )
 
     page = int(request.GET.get('page', '1'))
-    paginator = Paginator(goods, 100)
+    paginator = Paginator(goods, settings.GOODS_PER_PAGE)
     goods_page = paginator.get_page(page)
 
     categories_set = Category.objects.filter(
@@ -76,6 +77,7 @@ def stock_overview(request, store_place_pk):
         'all_store_places': all_store_places,
         'display_store_in_table': display_store_in_table,
         'paginator': paginator,
+        'goods_number_offset': (goods_page.number - 1) * settings.GOODS_PER_PAGE,
     }
 
     return render(request, template, context=context)

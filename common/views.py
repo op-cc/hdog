@@ -1,10 +1,12 @@
 from django.db.models import Q
 from django.shortcuts import render, redirect
+from django.views import View
 
 from categories.models import Category
 
 from hdog.models import (
     Goods,
+    Measure,
     StorePlace,
     Transfer,
 )
@@ -58,11 +60,22 @@ def stock_overview(request, store_place_pk):
     return render(request, template, context=context)
 
 
-def register_income(request):
-    template = 'common/register_income.html'
+class RegisterIncomeView(View):
+    template_name = 'common/register_income.html'
 
-    context = {
-        'title': 'Поступление'
-    }
+    def get(self, request, **kwargs):
+        goods = Goods.objects.all()
+        categories = Category.objects.all()
+        measures = Measure.objects.all()
+        store_place_pk = request.COOKIES.get('store_place_pk', StorePlace.objects.all()[0].pk)
 
-    return render(request, template, context=context)
+        context = {
+            'store_place_pk': store_place_pk,
+            'store_places': StorePlace.objects.all(),
+            'goods_set': goods,
+            'categories_set': categories,
+            'measures_set': measures,
+            'title': 'Поступление',
+        }
+
+        return render(request, self.template_name, context)

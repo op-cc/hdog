@@ -27,3 +27,41 @@ function resetGoodsFilter() {
 
     document.filtersForm.submit();
 }
+
+function addNewRow() {
+    var len = $('.goods-row').length;
+    $('<div/>', {
+               'class' : 'goods-row', 'id' : 'row' + len, html: GetGoodsRowHtml()
+     }).hide().appendTo('#goodsRowsContainer').slideDown('fast');
+
+    close_button = $('#deleteRow' + len);
+    close_button.on('click', function() {
+        removeGoodsRow(len);
+    });
+}
+
+function removeGoodsRow(rowId) {
+    row = $('#row' + rowId);
+    row.slideUp('fast', function() {
+        row.remove();
+    });
+}
+
+function GetGoodsRowHtml()
+{
+    var len = $('.goods-row').length;
+    var $html = $('.goods-row-template').clone();
+    $html.find('[name=category]')[0].name='category' + len;
+    $html.find('[name=goods]')[0].name='goods' + len;
+    $html.find('[name=measure]')[0].name='measure' + len;
+    $html.find('[name=gen_inv_numbers]')[0].name='gen_inv_numbers' + len;
+    $html.find('[id=quantity]')[0].id='quantity' + len;
+    $html.find('[id=price]')[0].id='price' + len;
+
+    if (len >= 1) {
+        close_button = $html.find('[id=deleteRow]')[0]
+        close_button.id='deleteRow' + len;
+        close_button.classList.remove('hidden');
+    }
+    return $html.html();
+}

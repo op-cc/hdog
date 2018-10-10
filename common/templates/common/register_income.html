@@ -1,1 +1,46 @@
 {% extends "common/base.html" %}
+
+{% block content %}
+  <div class="grid-y">
+    <form method="post">
+      {% csrf_token %}
+      <div class="cell cell-block-container">
+        <div class="grid-x grid-padding-x no-margin-right">
+          <div class="cell large-2 shrink">
+            <input type="number" min="0" step="1" name="transfer_number" id="transferNumber" placeholder="Номер">
+          </div>
+          <div class="cell shrink items-centered no-padding-right">
+            <p><label for="transferDate">Дата:</label> </p>
+          </div>
+          <div class="cell small-6 medium-3 large-2">
+            <input type="date" name="transfer_date" id="transferDate">
+          </div>
+        </div>
+      </div>
+      <div class="cell">
+        <textarea name="transfer_comment" id="transferComment" rows="3" placeholder="Комментарий"></textarea>
+      </div>
+      
+      <div id="goodsRowsContainer">
+        {% include "common/transfer_form_goods_row.html" %}
+      </div>
+
+      <div class="cell">
+        <button class="hollow button success" type="button" onclick="addNewRow()">Добавить ещё один ТМЦ</button>
+      </div>
+      <div class="cell">
+        <button class="button success" type="submit">Сохранить</button>
+      </div>
+    </form>
+  </div>
+{% endblock content %}
+
+{% block js %}
+  <script type='text/javascript'>
+    $(document).ready(function () {
+      $('<div/>', {
+         'class' : 'goods-row', 'id' : 'row0', html: GetGoodsRowHtml()
+      }).appendTo('#goodsRowsContainer');
+    })
+  </script>
+{% endblock js %} 

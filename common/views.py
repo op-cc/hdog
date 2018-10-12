@@ -4,11 +4,14 @@ from django.views import View
 
 from categories.models import Category
 
+from hdog.forms import GoodsRowForm, GoodsRowFormSet, TransferForm
 from hdog.models import (
+    Category,
     Goods,
     Measure,
     StorePlace,
     Transfer,
+    TransferedGoods,
 )
 
 
@@ -63,14 +66,14 @@ def stock_overview(request, store_place_pk):
 class RegisterIncomeView(View):
     template_name = 'common/register_income.html'
 
-    def get(self, request, **kwargs):
+    def get_context_data(self, request):
         goods = Goods.objects.all()
         categories = Category.objects.all()
         measures = Measure.objects.all()
         store_place_pk = request.COOKIES.get('store_place_pk', StorePlace.objects.all()[0].pk)
 
         context = {
-            'store_place_pk': store_place_pk,
+            'store_place_pk': int(store_place_pk),
             'store_places': StorePlace.objects.all(),
             'goods_set': goods,
             'categories_set': categories,
@@ -78,4 +81,39 @@ class RegisterIncomeView(View):
             'title': 'Поступление',
         }
 
-        return render(request, self.template_name, context)
+        return context
+
+    def get(self, request, **kwargs):
+        context = self.get_context_data(request)
+        print(context)
+
+        return render(request, self.template_name, context=context)
+
+    def post(self, request, **kwargs):
+        context = self.get_context_data(request)
+        
+        transfer_form = TransferForm(request.POST)
+        goods_form_set = GoodsRowFormSet(request.POST)
+
+        if transfer_form.is_valid() and goods_form_set.is_valid():
+            store = StorePlace.objects.get(pk=context['store_place_pk'])
+
+            income = Transfer(**transfer_form.cleaned_data)
+            income.save()
+
+            for goods_row in goods_form_set.cleaned_data:
+                TransferedGoods.create(
+                    income,
+                    goods_name=goods_row['goods'],
+                    price=goods_row['price'],
+                    quantity=goods_row['quantity'],
+                    recepient=store,
+                    inv_numbers=goods_row['inv_numbers'],
+                    category=goods_row['category'],
+                    measure=goods_row['measure'],
+                )
+        else:
+            print(transfer_form.errors)
+            print(goods_form_set.errors)
+
+        return render(request, self.template_name, context=context)

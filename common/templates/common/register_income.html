@@ -7,23 +7,24 @@
       <div class="cell cell-block-container">
         <div class="grid-x grid-padding-x no-margin-right">
           <div class="cell large-2 shrink">
-            <input type="number" min="0" step="1" name="transfer_number" id="transferNumber" placeholder="Номер">
+            <input type="number" min="0" step="1" name="number" id="transferNumber" placeholder="Номер">
           </div>
           <div class="cell shrink items-centered no-padding-right">
             <p><label for="transferDate">Дата:</label> </p>
           </div>
           <div class="cell small-6 medium-3 large-2">
-            <input type="date" name="transfer_date" id="transferDate">
+            <input type="date" name="date" id="transferDate">
           </div>
         </div>
       </div>
       <div class="cell">
-        <textarea name="transfer_comment" id="transferComment" rows="3" placeholder="Комментарий"></textarea>
+        <textarea name="comment" id="transferComment" rows="3" placeholder="Комментарий"></textarea>
       </div>
       
-      <div id="goodsRowsContainer">
-        {% include "common/transfer_form_goods_row.html" %}
-      </div>
+      <input type="hidden" name="form-TOTAL_FORMS" value="1">
+      <input type="hidden" name="form-INITIAL_FORMS" value="1">
+      <input type="hidden" name="form-MAX_NUM_FORMS" value="">
+      <div id="goodsRowsContainer"></div>
 
       <div class="cell">
         <button class="hollow button success" type="button" onclick="addNewRow()">Добавить ещё один ТМЦ</button>
@@ -32,6 +33,7 @@
         <button class="button success" type="submit">Сохранить</button>
       </div>
     </form>
+    {% include "common/transfer_form_goods_row.html" %}
   </div>
 {% endblock content %}
 

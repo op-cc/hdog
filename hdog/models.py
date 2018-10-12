@@ -109,7 +109,7 @@ class Goods(models.Model):
         unique_together = ('name', 'store_place')
 
     def __str__(self):
-        return '{} ({})'.format(self.name, self.store_place)
+        return '{}'.format(self.name)
 
 
 class InventoryNumber(models.Model):

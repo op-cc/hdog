@@ -51,17 +51,31 @@ function GetGoodsRowHtml()
 {
     var len = $('.goods-row').length;
     var $html = $('.goods-row-template').clone();
-    $html.find('[name=category]')[0].name='category' + len;
-    $html.find('[name=goods]')[0].name='goods' + len;
-    $html.find('[name=measure]')[0].name='measure' + len;
-    $html.find('[name=gen_inv_numbers]')[0].name='gen_inv_numbers' + len;
-    $html.find('[id=quantity]')[0].id='quantity' + len;
-    $html.find('[id=price]')[0].id='price' + len;
+
+    goods_row_fields = [
+        'form-FORMID-category',
+        'form-FORMID-goods',
+        'form-FORMID-measure',
+        'form-FORMID-quantity',
+        'form-FORMID-price',
+        'form-FORMID-generate_inv_numbers',
+        'form-FORMID-inv_numbers',
+    ];
+
+    for (var i = goods_row_fields.length - 1; i >= 0; i--) {
+        search_statement = '[name=' + goods_row_fields[i] + ']'
+        field = $html.find(search_statement)[0];
+
+        field.name = field.name.replace('FORMID', len);
+    }
 
     if (len >= 1) {
         close_button = $html.find('[id=deleteRow]')[0]
         close_button.id='deleteRow' + len;
         close_button.classList.remove('hidden');
     }
+
+    $('input[name=form-TOTAL_FORMS]').val(len + 1);
+
     return $html.html();
 }

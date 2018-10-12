@@ -29,9 +29,9 @@ function resetGoodsFilter() {
 }
 
 function addNewRow() {
-    var len = $('.goods-row').length;
+    var len = $('.goods-transfer-row').length;
     $('<div/>', {
-               'class' : 'goods-row', 'id' : 'row' + len, html: GetGoodsRowHtml()
+               'class' : 'goods-transfer-row', 'id' : 'row' + len, html: GetGoodsRowHtml()
      }).hide().appendTo('#goodsRowsContainer').slideDown('fast');
 
     close_button = $('#deleteRow' + len);
@@ -49,8 +49,8 @@ function removeGoodsRow(rowId) {
 
 function GetGoodsRowHtml()
 {
-    var len = $('.goods-row').length;
-    var $html = $('.goods-row-template').clone();
+    var len = $('.goods-transfer-row').length;
+    var $html = $('.goods-transfer-row-template').clone();
 
     goods_row_fields = [
         'form-FORMID-category',

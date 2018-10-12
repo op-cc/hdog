@@ -79,13 +79,14 @@ class RegisterIncomeView(View):
             'categories_set': categories,
             'measures_set': measures,
             'title': 'Поступление',
+            'transfer_form': TransferForm(),
+            'goods_form_set': GoodsRowFormSet(),
         }
 
         return context
 
     def get(self, request, **kwargs):
         context = self.get_context_data(request)
-        print(context)
 
         return render(request, self.template_name, context=context)
 
@@ -113,7 +114,7 @@ class RegisterIncomeView(View):
                     measure=goods_row['measure'],
                 )
         else:
-            print(transfer_form.errors)
-            print(goods_form_set.errors)
+            context['transfer_form'] = transfer_form
+            context['goods_form_set'] = goods_form_set
 
         return render(request, self.template_name, context=context)

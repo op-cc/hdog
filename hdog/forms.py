@@ -1,14 +1,26 @@
+from datetime import date as ddate
+
 from django import forms
 
 from categories.models import Category
 
+from .widgets import DateDropdownInput
 from .models import Measure, Transfer
 
 
 class TransferForm(forms.ModelForm):
+    date = forms.DateField(label='Дата', widget=DateDropdownInput, initial=str(ddate.today()))
+    number = forms.IntegerField(label='Номер', required=False, min_value=1)
+    comment = forms.CharField(label='Комментарий', widget=forms.widgets.Textarea)
+
+    number.widget.attrs.update(placeholder=number.label)
+    comment.widget.attrs.update(placeholder=comment.label)
+    comment.widget.attrs.update(rows=3)
+
     class Meta:
         model = Transfer
         fields = ['date', 'number', 'comment']
+
 
 
 class InvNumbersField(forms.CharField):

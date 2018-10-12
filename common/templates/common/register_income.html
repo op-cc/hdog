@@ -7,21 +7,23 @@
       <div class="cell cell-block-container">
         <div class="grid-x grid-padding-x no-margin-right">
           <div class="cell large-2 shrink">
-            <input type="number" min="0" step="1" name="number" id="transferNumber" placeholder="Номер">
+            {{ transfer_form.number }}
           </div>
           <div class="cell shrink items-centered no-padding-right">
-            <p><label for="transferDate">Дата:</label> </p>
+            <p><label for="{{ transfer_form.date.id_for_label }}">
+              {{ transfer_form.date.label }}:
+            </label></p>
           </div>
           <div class="cell small-6 medium-3 large-2">
-            <input type="date" name="date" id="transferDate">
+            {{ transfer_form.date }}
           </div>
         </div>
       </div>
       <div class="cell">
-        <textarea name="comment" id="transferComment" rows="3" placeholder="Комментарий"></textarea>
+        {{ transfer_form.comment }}
       </div>
       
-      <input type="hidden" name="form-TOTAL_FORMS" value="1">
+      <input type="hidden" name="form-TOTAL_FORMS" value="{{ goods_form_set|length }}">
       <input type="hidden" name="form-INITIAL_FORMS" value="1">
       <input type="hidden" name="form-MAX_NUM_FORMS" value="">
       <div id="goodsRowsContainer"></div>
@@ -33,7 +35,7 @@
         <button class="button success" type="submit">Сохранить</button>
       </div>
     </form>
-    {% include "common/transfer_form_goods_row.html" %}
+    {% include "common/transfer_form_goods_row_template.html" %}
   </div>
 {% endblock content %}
 

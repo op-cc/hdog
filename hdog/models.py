@@ -415,6 +415,9 @@ class TransferedGoods(models.Model):
             generate_inv_numbers,
         )
 
+        if simulate:
+            clear_inv_numbers_qs.delete()
+
         """
         Выполнение операции
         """

@@ -128,4 +128,6 @@ class RegisterIncomeView(View):
             context['transfer_form'] = transfer_form
             context['goods_form_set'] = goods_form_set
 
+            income.delete()
+
         return render(request, self.template_name, context=context)

@@ -382,6 +382,25 @@ class TransferedGoods(models.Model):
         sender_goods = None
         recepient_goods = None
         if recepient:
+            try:
+                existing_goods = Goods.objects.filter(
+                    name=goods_name,
+                )[0]
+                if existing_goods.unit != measure:
+                    raise ValueError(
+                        'ТМЦ с данным наименованием должно иметь единицу измерения {}'.format(
+                            existing_goods.unit
+                        )
+                    )
+                elif existing_goods.category != category:
+                    raise ValueError(
+                        'ТМЦ с данным наименованием должно иметь категорию {}'.format(
+                            existing_goods.category
+                        )
+                    )
+            except IndexError:
+                pass
+
             recepient_goods, _ = Goods.objects.get_or_create(
                 name=goods_name,
                 store_place=recepient,

@@ -31,12 +31,30 @@ class InvNumbersField(forms.CharField):
     def clean(self, value):
         result = super().clean(value)
 
-        print(value)
-
         if result:
-            result = [int(inv_number.strip()) for inv_number in result.split(',')]
+            inv_numbers_list = []
+            for s in result.split(','):
+                try:
+                    if s.find('-') > 0:
+                        inv_numbers_range = s.split('-')
 
-        return result
+                        if len(inv_numbers_range) != 2:
+                            raise ValueError
+
+                        range_start = int(inv_numbers_range[0])
+                        range_end = int(inv_numbers_range[1])
+
+                        if range_start > range_end:
+                            raise ValueError
+
+                        inv_numbers_list += range(range_start, range_end + 1)
+                    else:
+                        inv_numbers_list += [int(s)]
+                except ValueError:
+                    raise forms.ValidationError('Неверный формат инвентарных номеров')
+
+        # Убираем дупликаты
+        return list(set(inv_numbers_list))
 
 
 class GoodsRowForm(forms.Form):

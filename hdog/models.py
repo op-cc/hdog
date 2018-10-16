@@ -158,7 +158,7 @@ class Transfer(models.Model):
 
     date = models.DateField(verbose_name='дата', default=date.today)
     number = models.PositiveSmallIntegerField(verbose_name='номер', blank=True, null=True)
-    comment = models.TextField(verbose_name='комментарий')
+    comment = models.TextField(verbose_name='комментарий', blank=True, null=True)
 
     class Meta:
         verbose_name = 'перемещение'

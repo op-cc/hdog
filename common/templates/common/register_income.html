@@ -1,0 +1,64 @@
+{% extends "common/base.html" %}
+
+{% block content %}
+  <div class="grid-y">
+    <form method="post">
+      {% csrf_token %}
+      <div class="cell cell-block-container">
+        <div class="grid-x grid-padding-x no-margin-right">
+          <div class="cell large-2 shrink">
+            {{ transfer_form.number }}
+          </div>
+          <div class="cell shrink items-centered no-padding-right">
+            <p><label for="{{ transfer_form.date.id_for_label }}">
+              {{ transfer_form.date.label }}:
+            </label></p>
+          </div>
+          <div class="cell small-6 medium-3 large-2">
+            {{ transfer_form.date }}
+          </div>
+        </div>
+      </div>
+      <div class="cell">
+        {{ transfer_form.comment }}
+      </div>
+      
+      <input type="hidden" name="form-TOTAL_FORMS" value="{{ goods_form_set|length }}">
+      <input type="hidden" name="form-INITIAL_FORMS" value="1">
+      <input type="hidden" name="form-MAX_NUM_FORMS" value="">
+      <div id="goodsRowsContainer">
+        {% if goods_form_set.is_bound %}
+          {% for goods_row_form in goods_form_set %}
+            {% include "common/transfer_form_goods_row.html" %}
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <div class="cell">
+        <button class="hollow button success" type="button" onclick="addNewRow()">Добавить ещё один ТМЦ</button>
+      </div>
+      <div class="cell">
+        <button class="button success" type="submit">Сохранить</button>
+      </div>
+    </form>
+    {% include "common/transfer_form_goods_row_template.html" %}
+  </div>
+{% endblock content %}
+
+{% block js %}
+  {% if not goods_form_set.is_bound %}
+  <script type='text/javascript'>
+    $(document).ready(function () {
+      $('<div/>', {
+         'class' : 'goods-transfer-row', 'id' : 'row0', html: GetGoodsRowHtml()
+      }).appendTo('#goodsRowsContainer');
+    })
+  </script>
+  {% else %}
+    <script type='text/javascript'>
+    $(document).ready(function () {
+      activateCloseButtonsOnGoodsRows();
+    })
+  </script>
+  {% endif %}
+{% endblock js %} 

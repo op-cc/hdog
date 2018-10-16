@@ -1,0 +1,56 @@
+<div class="grid-y goods-transfer-row-template">
+  <div class="cell cell-block-container">
+    <div class="grid-x grid-padding-x no-margin-right">
+      <div class="cell medium-3">
+        <select name="form-FORMID-category">
+          {% for category in categories_set %}
+            <option value="{{ category.pk }}">{{ category }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="cell auto">
+        <input list="goods" name="form-FORMID-goods" placeholder="ТМЦ" type="text">
+        <datalist id="goods">
+          {% for goods in goods_set %}
+            <option value="{{ goods }}">{{ goods }}</option>
+          {% endfor %}
+        </datalist>
+      </div>
+      <div class="cell medium-2 cell-block-container">
+        <div class="grid-x grid-padding-x">
+          <div class="cell shrink items-centered quantity-label">
+            <p>Количество:</p>
+          </div>
+          <div class="cell auto no-padding-left">
+            <input type="number" min="0" step="any" name="form-FORMID-quantity">
+          </div>
+        </div>
+      </div>
+      <div class="cell medium-2 no-padding-right">
+        <select name="form-FORMID-measure">
+          {% for measure in measures_set %}
+            <option value="{{ measure.pk }}">{{ measure }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="cell shrink no-padding-right close-btn hidden" id="deleteRow">
+        <p>x</p>
+      </div>
+    </div>
+  </div>
+  <div class="cell cell-block-container">
+    <div class="grid-x grid-padding-x no-margin-right">
+      <div class="cell medium-2">
+        <input type="number" min="0" step="any" name="form-FORMID-price" placeholder="Цена">
+      </div>
+      <div class="cell shrink items-aligned-at-end">
+        <label><input type="checkbox" name="form-FORMID-generate_inv_numbers" value="1"/>
+          Сгенерировать инвентарные номера
+        </label>
+      </div>
+      <div class="cell auto no-padding-right">
+        <input type="text" name="form-FORMID-inv_numbers", placeholder="Инвентарные номера">
+      </div>
+    </div>
+  </div>
+</div>

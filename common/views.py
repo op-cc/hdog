@@ -113,7 +113,6 @@ class RegisterIncomeView(View):
 
         if transfer_is_valid and goods_form_set.is_valid():
             for goods_row in goods_form_set.cleaned_data:
-                print(InventoryNumber.objects.all())
                 TransferedGoods.create(
                     income,
                     goods_name=goods_row['goods'],

@@ -99,7 +99,6 @@ class GoodsRowForm(forms.Form):
         }
 
         try:
-            print('test')
             TransferedGoods.create(**transfer_create_args)
         except (ObjectDoesNotExist, RuntimeError, ValueError) as e:
             raise forms.ValidationError(str(e))

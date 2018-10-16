@@ -318,7 +318,7 @@ class TransferedGoods(models.Model):
 
             if not generate_inv_numbers and \
                not inv_numbers_count == 0 and \
-               inv_numbers_count < quantity:
+               inv_numbers_count != quantity:
                 raise ValueError('Количество инвентарных номеров должно совпадать '
                                  'с количеством перемещаемых ТМЦ'
                                  )

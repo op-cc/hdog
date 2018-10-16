@@ -28,6 +28,23 @@ function resetGoodsFilter() {
     document.filtersForm.submit();
 }
 
+function jumpToUrl(url) {
+    document.location.href = document.location.protocol
+    + '//'
+    + document.location.host
+    + url;
+}
+
+function prepareGoodsTable() {
+    goods_rows = $('.goods-row');
+
+    for (i = goods_rows.length - 1; i >= 0; i--) {
+        goods_row = goods_rows[i];
+        url = goods_row.getElementsByClassName('hidden-url')[0].innerText;
+
+        goods_row.addEventListener("click", jumpToUrl.bind(null, url));
+    }
+
 function addNewRow() {
     var len = $('.goods-transfer-row').length;
     $('<div/>', {

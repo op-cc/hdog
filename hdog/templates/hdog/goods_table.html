@@ -1,22 +1,30 @@
-{% if not goods_set %}
+{% if not goods_page %}
   <p>Нет ни одного ТМЦ, удовлетворяющего выбранным условиям</p>
 {% else %}
   <table>
   <thead>
     <tr>
+      <th style="display: none"></th>
       <th>№</th>
+      {% if display_store_in_table %}
+      <th>Место хранения</th>
+      {% endif %}
       <th>Категория</th>
       <th>Наименование</th>
       <th>Количество</th>
     </tr>
   </thead>
   <tbody>
-    {% for goods in goods_set %}
-      <tr>
-        <td>{{ forloop.counter }}</td>
-        <td>{{ goods.category }}</td>
-        <td>{{ goods.name }}</td>
-        <td>{{ goods.quantity }} {{ goods.measure.national_symbol }}</td>
+    {% for goods in goods_page %}
+      <tr class="goods-row">
+        <td class='hidden-url' style="display: none;">{% url 'admin:hdog_goods_change' goods.id %}</td>
+        <td><a class='table-row-link' href="{% url 'admin:hdog_goods_change' goods.id %}">{{ goods_number_offset|add:forloop.counter }}</a></td>
+        {% if display_store_in_table %}
+        <td><a class='table-row-link' href="{% url 'admin:hdog_goods_change' goods.id %}">{{ goods.store_place }}</a></td>
+        {% endif %}
+        <td><a class='table-row-link' href="{% url 'admin:hdog_goods_change' goods.id %}">{{ goods.category }}</a></td>
+        <td><a class='table-row-link' href="{% url 'admin:hdog_goods_change' goods.id %}">{{ goods.name }}</a></td>
+        <td><a class='table-row-link' href="{% url 'admin:hdog_goods_change' goods.id %}">{{ goods.quantity }} {{ goods.measure.national_symbol }}</a></td>
       </tr>
     {% endfor %}
   </tbody>

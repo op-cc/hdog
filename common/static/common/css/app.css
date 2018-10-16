@@ -23,6 +23,33 @@
   width: 9em;
 }
 
+.using-all-vheight {
+  height: 100vh;
+}
+
+.add-content-title {
+  height: 73px;
+}
+
+.goods-row:hover {
+  background: lightblue;
+  cursor: pointer;
+}
+
+td a.table-row-link {
+  display: block;
+  color: inherit;
+}
+
+.pagination-bar {
+  display: flex;
+  justify-content: center;
+}
+
+html {
+  font-size: 14px;
+}
+
 .goods-transfer-row-template {
   display: none;
 }

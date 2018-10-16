@@ -44,6 +44,7 @@ function prepareGoodsTable() {
 
         goods_row.addEventListener("click", jumpToUrl.bind(null, url));
     }
+}
 
 function addNewRow() {
     var len = $('.goods-transfer-row').length;

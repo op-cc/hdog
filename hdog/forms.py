@@ -12,7 +12,11 @@ from .models import Measure, Transfer, TransferedGoods
 class TransferForm(forms.ModelForm):
     date = forms.DateField(label='Дата', widget=DateDropdownInput, initial=str(ddate.today()))
     number = forms.IntegerField(label='Номер', required=False, min_value=1)
-    comment = forms.CharField(label='Комментарий', widget=forms.widgets.Textarea)
+    comment = forms.CharField(
+        label='Комментарий',
+        required=False,
+        widget=forms.widgets.Textarea,
+    )
 
     number.widget.attrs.update(placeholder=number.label)
     comment.widget.attrs.update(placeholder=comment.label)

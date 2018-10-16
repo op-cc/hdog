@@ -31,8 +31,8 @@ class InvNumbersField(forms.CharField):
     def clean(self, value):
         result = super().clean(value)
 
+        inv_numbers_list = []
         if result:
-            inv_numbers_list = []
             for s in result.split(','):
                 try:
                     if s.find('-') > 0:

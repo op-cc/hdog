@@ -120,6 +120,7 @@ class RegisterIncomeView(View):
                     price=goods_row['price'],
                     quantity=goods_row['quantity'],
                     recepient=store,
+                    generate_inv_numbers=goods_row['generate_inv_numbers'],
                     inv_numbers=goods_row['inv_numbers'],
                     category=goods_row['category'],
                     measure=goods_row['measure'],

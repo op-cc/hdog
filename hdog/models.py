@@ -1,4 +1,5 @@
 from datetime import date
+from decimal import Decimal
 from typing import List, Tuple
 
 from django.conf import settings
@@ -243,7 +244,7 @@ class TransferedGoods(models.Model):
         on_delete=models.CASCADE,
     )
     quantity = models.PositiveIntegerField(verbose_name='количество')
-    price = models.PositiveIntegerField(verbose_name='цена')
+    price = models.DecimalField(verbose_name='цена', decimal_places=2, max_digits=20)
     inv_numbers = models.ManyToManyField(
         InventoryNumber,
         verbose_name='инвентарные номера',
@@ -279,7 +280,7 @@ class TransferedGoods(models.Model):
         return self._get_goods_attribute('unit')
 
     def _transferBaseChecks(sender: StorePlace, recepient: StorePlace,
-                            quantity: int, price: int):
+                            quantity: int, price: Decimal):
         if quantity <= 0:
             raise ValueError('Количество перемещаемых ТМЦ должно быть больше нуля')
         if price <= 0:
@@ -369,7 +370,7 @@ class TransferedGoods(models.Model):
 
         return result, res_created
 
-    def create(transfer: Transfer, goods_name: str, price: int, quantity: int,
+    def create(transfer: Transfer, goods_name: str, price: Decimal, quantity: int,
                sender: StorePlace = None, recepient: StorePlace = None,
                inv_numbers: List[int] = None, inv_numbers_qs: QuerySet = None,
                generate_inv_numbers: bool = False, category: Category = None,

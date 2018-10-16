@@ -68,7 +68,7 @@ class RegisterIncomeView(View):
     template_name = 'common/register_income.html'
 
     def get_context_data(self, request):
-        goods = Goods.objects.all()
+        goods = Goods.objects.order_by().values('name').distinct()
         categories = Category.objects.all()
         measures = Measure.objects.all()
         store_place_pk = request.COOKIES.get('store_place_pk', StorePlace.objects.all()[0].pk)

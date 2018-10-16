@@ -52,13 +52,7 @@
       $('<div/>', {
          'class' : 'goods-transfer-row', 'id' : 'row0', html: GetGoodsRowHtml()
       }).appendTo('#goodsRowsContainer');
-    })
-  </script>
-  {% else %}
-    <script type='text/javascript'>
-    $(document).ready(function () {
-      activateCloseButtonsOnGoodsRows();
-    })
+    });
   </script>
   {% endif %}
 {% endblock js %} 

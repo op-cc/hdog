@@ -435,7 +435,8 @@ class TransferedGoods(models.Model):
         )
 
         if simulate:
-            clear_inv_numbers_qs.delete()
+            if clear_inv_numbers_qs:
+                clear_inv_numbers_qs.delete()
 
         """
         Выполнение операции

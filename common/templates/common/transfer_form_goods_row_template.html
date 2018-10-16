@@ -12,7 +12,7 @@
         <input list="goods" name="form-FORMID-goods" placeholder="ТМЦ" type="text">
         <datalist id="goods">
           {% for goods in goods_set %}
-            <option value="{{ goods }}">{{ goods }}</option>
+            <option value="{{ goods.name }}">{{ goods.name }}</option>
           {% endfor %}
         </datalist>
       </div>

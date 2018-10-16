@@ -39,7 +39,7 @@
         {{ goods_row_form.goods }}
         <datalist id="goods">
           {% for goods in goods_set %}
-            <option value="{{ goods }}">{{ goods }}</option>
+            <option value="{{ goods.name }}">{{ goods.name }}</option>
           {% endfor %}
         </datalist>
       </div>

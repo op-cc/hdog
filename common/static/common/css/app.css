@@ -22,3 +22,75 @@
 .filters-button {
   width: 9em;
 }
+
+.goods-transfer-row-template {
+  display: none;
+}
+
+.goods-transfer-row {
+  margin-top: 2rem;
+}
+
+.no-margin-right {
+  margin-right: 0rem !important;
+}
+
+.no-padding-right {
+  padding-right: 0rem !important;
+}
+
+.no-padding-left {
+  padding-left: 0rem !important;
+}
+
+.items-centered {
+  display: flex;
+  align-items: center;
+}
+
+.items-aligned-at-end {
+  display: flex;
+  align-items: end;
+}
+
+.grid-padding-x > .cell .quantity-label {
+  padding-right: 0.6rem;
+}
+
+.close-btn {
+  cursor: pointer;
+  color: red;
+}
+
+.hidden {
+  display: none;
+}
+
+.errorlist {
+  padding: 7px;
+  background-color: #ff665b; /* Red */
+  color: white;
+  margin-bottom: 15px;
+  border-radius: 10px;
+}
+
+.errorlist > ul {
+  margin-bottom: 0px;
+}
+
+/* The close button */
+.closebtn {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* When moving the mouse over the close button */
+.closebtn:hover {
+    color: black;
+}

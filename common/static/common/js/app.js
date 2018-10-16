@@ -27,3 +27,71 @@ function resetGoodsFilter() {
 
     document.filtersForm.submit();
 }
+
+function addNewRow() {
+    var len = $('.goods-transfer-row').length;
+    $('<div/>', {
+               'class' : 'goods-transfer-row', 'id' : 'row' + len, html: GetGoodsRowHtml()
+     }).hide().appendTo('#goodsRowsContainer').slideDown('fast');
+
+    close_button = $('#deleteRow' + len);
+    close_button.on('click', function() {
+        removeGoodsRow(len);
+    });
+}
+
+function removeGoodsRow(rowId) {
+    var rows_count = $('.goods-transfer-row').length;
+    $('input[name=form-TOTAL_FORMS]').val(rows_count - 1);
+
+    row = $('#row' + rowId);
+    row.slideUp('fast', function() {
+        row.remove();
+    });
+
+    var inputs_search_regexp = /form-(\d+)/
+    $('input').filter(function() {
+        return this.name.match(inputs_search_regexp);
+    }).each(function(i, el) {
+        match = inputs_search_regexp.exec(el.name);
+
+        if (match[1] > rowId) {
+            newId = match[1] - 1;
+            // el.id = el.id.replace('id_form-' + match[1], 'id_form-' + newId);
+            el.name = el.name.replace('form-' + match[1], 'form-' + newId);
+        }
+    });
+}
+
+function GetGoodsRowHtml()
+{
+    var len = $('.goods-transfer-row').length;
+    var $html = $('.goods-transfer-row-template').clone();
+
+    goods_row_fields = [
+        'form-FORMID-category',
+        'form-FORMID-goods',
+        'form-FORMID-measure',
+        'form-FORMID-quantity',
+        'form-FORMID-price',
+        'form-FORMID-generate_inv_numbers',
+        'form-FORMID-inv_numbers',
+    ];
+
+    for (var i = goods_row_fields.length - 1; i >= 0; i--) {
+        search_statement = '[name=' + goods_row_fields[i] + ']';
+        field = $html.find(search_statement)[0];
+
+        field.name = field.name.replace('FORMID', len);
+    }
+
+    if (len >= 1) {
+        close_button = $html.find('[id=deleteRow]')[0];
+        close_button.id='deleteRow' + len;
+        close_button.classList.remove('hidden');
+    }
+
+    $('input[name=form-TOTAL_FORMS]').val(len + 1);
+
+    return $html.html();
+}

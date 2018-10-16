@@ -109,7 +109,7 @@ class Goods(models.Model):
         unique_together = ('name', 'store_place')
 
     def __str__(self):
-        return '{} ({})'.format(self.name, self.store_place)
+        return '{}'.format(self.name)
 
 
 class InventoryNumber(models.Model):
@@ -158,7 +158,7 @@ class Transfer(models.Model):
 
     date = models.DateField(verbose_name='дата', default=date.today)
     number = models.PositiveSmallIntegerField(verbose_name='номер', blank=True, null=True)
-    comment = models.TextField(verbose_name='комментарий')
+    comment = models.TextField(verbose_name='комментарий', blank=True, null=True)
 
     class Meta:
         verbose_name = 'перемещение'
@@ -318,7 +318,7 @@ class TransferedGoods(models.Model):
 
             if not generate_inv_numbers and \
                not inv_numbers_count == 0 and \
-               inv_numbers_count < quantity:
+               inv_numbers_count != quantity:
                 raise ValueError('Количество инвентарных номеров должно совпадать '
                                  'с количеством перемещаемых ТМЦ'
                                  )
@@ -373,7 +373,7 @@ class TransferedGoods(models.Model):
                sender: StorePlace = None, recepient: StorePlace = None,
                inv_numbers: List[int] = None, inv_numbers_qs: QuerySet = None,
                generate_inv_numbers: bool = False, category: Category = None,
-               measure: Measure = None,
+               measure: Measure = None, simulate: bool = False,
                ) -> 'TransferedGoods':
         """
         Создание пункта перемещения после выполнения всех проверок на ошибки
@@ -382,6 +382,25 @@ class TransferedGoods(models.Model):
         sender_goods = None
         recepient_goods = None
         if recepient:
+            try:
+                existing_goods = Goods.objects.filter(
+                    name=goods_name,
+                )[0]
+                if existing_goods.unit != measure:
+                    raise ValueError(
+                        'ТМЦ с данным наименованием должно иметь единицу измерения {}'.format(
+                            existing_goods.unit
+                        )
+                    )
+                elif existing_goods.category != category:
+                    raise ValueError(
+                        'ТМЦ с данным наименованием должно иметь категорию {}'.format(
+                            existing_goods.category
+                        )
+                    )
+            except IndexError:
+                pass
+
             recepient_goods, _ = Goods.objects.get_or_create(
                 name=goods_name,
                 store_place=recepient,
@@ -415,26 +434,33 @@ class TransferedGoods(models.Model):
             generate_inv_numbers,
         )
 
+        if simulate:
+            if clear_inv_numbers_qs:
+                clear_inv_numbers_qs.delete()
+
         """
         Выполнение операции
         """
-        transfered_goods = TransferedGoods.objects.create(
-            transfer=transfer,
-            sender_goods=sender_goods,
-            recepient_goods=recepient_goods,
-            quantity=quantity,
-            price=price,
-        )
+        transfered_goods = None
 
-        if sender:
-            sender_goods.quantity -= quantity
-            sender_goods.save()
-        if recepient:
-            recepient_goods.quantity += quantity
-            recepient_goods.save()
+        if not simulate:
+            transfered_goods = TransferedGoods.objects.create(
+                transfer=transfer,
+                sender_goods=sender_goods,
+                recepient_goods=recepient_goods,
+                quantity=quantity,
+                price=price,
+            )
 
-            if clear_inv_numbers_qs:
-                clear_inv_numbers_qs.update(supply=recepient_goods)
-                transfered_goods.inv_numbers.set(list(clear_inv_numbers_qs))
+            if sender:
+                sender_goods.quantity -= quantity
+                sender_goods.save()
+            if recepient:
+                recepient_goods.quantity += quantity
+                recepient_goods.save()
+
+                if clear_inv_numbers_qs:
+                    clear_inv_numbers_qs.update(supply=recepient_goods)
+                    transfered_goods.inv_numbers.set(list(clear_inv_numbers_qs))
 
         return transfered_goods

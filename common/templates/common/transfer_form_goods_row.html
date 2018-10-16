@@ -1,0 +1,79 @@
+<div class="grid-y goods-transfer-row" id="row{{ forloop.counter0 }}">
+  <div class="cell cell-block-container">
+    <div class="grid-x">
+      <div class="cell medium-7 large-5 errorlist">
+        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+        {{ goods_row_form.non_field_errors }}
+
+        {% with goods_row_form as grf %}
+          {% if grf.errors %}
+          <ul>
+            {% for error in grf.category.errors %}
+              <li>{{ grf.category.label }}: {{ error }}
+            {% endfor %}
+            {% for error in grf.goods.errors %}
+              <li>{{ grf.goods.label }}: {{ error }}
+            {% endfor %}
+            {% for error in grf.quantity.errors %}
+              <li>{{ grf.quantity.label }}: {{ error }}
+            {% endfor %}
+            {% for error in grf.measure.errors %}
+              <li>{{ grf.measure.label }}: {{ error }}
+            {% endfor %}
+            {% for error in grf.price.errors %}
+              <li>{{ grf.price.label }}: {{ error }}
+            {% endfor %}
+            {% for error in grf.inv_numbers.errors %}
+              <li>{{ grf.inv_numbers.label }}: {{ error }}
+            {% endfor %}
+          </ul>
+          {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+    <div class="grid-x grid-padding-x no-margin-right">
+      <div class="cell medium-3">
+        {{ goods_row_form.category }}
+      </div>
+      <div class="cell auto">
+        {{ goods_row_form.goods }}
+        <datalist id="goods">
+          {% for goods in goods_set %}
+            <option value="{{ goods }}">{{ goods }}</option>
+          {% endfor %}
+        </datalist>
+      </div>
+      <div class="cell medium-2 cell-block-container">
+        <div class="grid-x grid-padding-x">
+          <div class="cell shrink items-centered quantity-label">
+            <p>Количество:</p>
+          </div>
+          <div class="cell auto no-padding-left">
+            {{ goods_row_form.quantity }}
+          </div>
+        </div>
+      </div>
+      <div class="cell medium-2 no-padding-right">
+        {{ goods_row_form.measure }}
+      </div>
+      <div class="cell shrink no-padding-right close-btn {% if forloop.counter0 == 0 %}hidden{% endif %}" onclick="removeGoodsRow({{ forloop.counter0 }})">
+        <p>x</p>
+      </div>
+    </div>
+  </div>
+  <div class="cell cell-block-container">
+    <div class="grid-x grid-padding-x no-margin-right">
+      <div class="cell medium-2">
+        {{ goods_row_form.price }}
+      </div>
+      <div class="cell shrink items-aligned-at-end">
+        <label> {{ goods_row_form.generate_inv_numbers }}
+          Сгенерировать инвентарные номера
+        </label>
+      </div>
+      <div class="cell auto no-padding-right">
+        {{ goods_row_form.inv_numbers }}
+      </div>
+    </div>
+  </div>
+</div>

@@ -12,6 +12,7 @@ from hdog.models import (
     StorePlace,
     Transfer,
     TransferedGoods,
+    InventoryNumber,
 )
 
 
@@ -92,17 +93,27 @@ class RegisterIncomeView(View):
 
     def post(self, request, **kwargs):
         context = self.get_context_data(request)
-        
-        transfer_form = TransferForm(request.POST)
-        goods_form_set = GoodsRowFormSet(request.POST)
 
-        if transfer_form.is_valid() and goods_form_set.is_valid():
+        transfer_form = TransferForm(request.POST)
+
+        transfer_is_valid = transfer_form.is_valid()
+
+        if transfer_is_valid:
             store = StorePlace.objects.get(pk=context['store_place_pk'])
 
             income = Transfer(**transfer_form.cleaned_data)
             income.save()
+            income.refresh_from_db()
 
+            goods_form_set = GoodsRowFormSet(request.POST)
+
+            for form in goods_form_set:
+                form.transfer = income
+                form.recepient = store
+
+        if transfer_is_valid and goods_form_set.is_valid():
             for goods_row in goods_form_set.cleaned_data:
+                print(InventoryNumber.objects.all())
                 TransferedGoods.create(
                     income,
                     goods_name=goods_row['goods'],

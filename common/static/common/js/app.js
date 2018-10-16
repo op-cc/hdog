@@ -41,9 +41,25 @@ function addNewRow() {
 }
 
 function removeGoodsRow(rowId) {
+    var rows_count = $('.goods-transfer-row').length;
+    $('input[name=form-TOTAL_FORMS]').val(rows_count - 1);
+
     row = $('#row' + rowId);
     row.slideUp('fast', function() {
         row.remove();
+    });
+
+    var inputs_search_regexp = /form-(\d+)/
+    $('input').filter(function() {
+        return this.name.match(inputs_search_regexp);
+    }).each(function(i, el) {
+        match = inputs_search_regexp.exec(el.name);
+
+        if (match[1] > rowId) {
+            newId = match[1] - 1;
+            // el.id = el.id.replace('id_form-' + match[1], 'id_form-' + newId);
+            el.name = el.name.replace('form-' + match[1], 'form-' + newId);
+        }
     });
 }
 
@@ -63,14 +79,14 @@ function GetGoodsRowHtml()
     ];
 
     for (var i = goods_row_fields.length - 1; i >= 0; i--) {
-        search_statement = '[name=' + goods_row_fields[i] + ']'
+        search_statement = '[name=' + goods_row_fields[i] + ']';
         field = $html.find(search_statement)[0];
 
         field.name = field.name.replace('FORMID', len);
     }
 
     if (len >= 1) {
-        close_button = $html.find('[id=deleteRow]')[0]
+        close_button = $html.find('[id=deleteRow]')[0];
         close_button.id='deleteRow' + len;
         close_button.classList.remove('hidden');
     }

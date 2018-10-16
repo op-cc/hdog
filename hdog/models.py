@@ -373,7 +373,7 @@ class TransferedGoods(models.Model):
                sender: StorePlace = None, recepient: StorePlace = None,
                inv_numbers: List[int] = None, inv_numbers_qs: QuerySet = None,
                generate_inv_numbers: bool = False, category: Category = None,
-               measure: Measure = None,
+               measure: Measure = None, simulate: bool = False,
                ) -> 'TransferedGoods':
         """
         Создание пункта перемещения после выполнения всех проверок на ошибки
@@ -418,23 +418,26 @@ class TransferedGoods(models.Model):
         """
         Выполнение операции
         """
-        transfered_goods = TransferedGoods.objects.create(
-            transfer=transfer,
-            sender_goods=sender_goods,
-            recepient_goods=recepient_goods,
-            quantity=quantity,
-            price=price,
-        )
+        transfered_goods = None
 
-        if sender:
-            sender_goods.quantity -= quantity
-            sender_goods.save()
-        if recepient:
-            recepient_goods.quantity += quantity
-            recepient_goods.save()
+        if not simulate:
+            transfered_goods = TransferedGoods.objects.create(
+                transfer=transfer,
+                sender_goods=sender_goods,
+                recepient_goods=recepient_goods,
+                quantity=quantity,
+                price=price,
+            )
 
-            if clear_inv_numbers_qs:
-                clear_inv_numbers_qs.update(supply=recepient_goods)
-                transfered_goods.inv_numbers.set(list(clear_inv_numbers_qs))
+            if sender:
+                sender_goods.quantity -= quantity
+                sender_goods.save()
+            if recepient:
+                recepient_goods.quantity += quantity
+                recepient_goods.save()
+
+                if clear_inv_numbers_qs:
+                    clear_inv_numbers_qs.update(supply=recepient_goods)
+                    transfered_goods.inv_numbers.set(list(clear_inv_numbers_qs))
 
         return transfered_goods

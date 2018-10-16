@@ -1,15 +1,42 @@
-<div class="grid-y goods-transfer-row">
+<div class="grid-y goods-transfer-row" id="row{{ forloop.counter0 }}">
   <div class="cell cell-block-container">
+    <div class="grid-x">
+      <div class="cell medium-7 large-5 errorlist">
+        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+        {{ goods_row_form.non_field_errors }}
+
+        {% with goods_row_form as grf %}
+          {% if grf.errors %}
+          <ul>
+            {% for error in grf.category.errors %}
+              <li>{{ grf.category.label }}: {{ error }}
+            {% endfor %}
+            {% for error in grf.goods.errors %}
+              <li>{{ grf.goods.label }}: {{ error }}
+            {% endfor %}
+            {% for error in grf.quantity.errors %}
+              <li>{{ grf.quantity.label }}: {{ error }}
+            {% endfor %}
+            {% for error in grf.measure.errors %}
+              <li>{{ grf.measure.label }}: {{ error }}
+            {% endfor %}
+            {% for error in grf.price.errors %}
+              <li>{{ grf.price.label }}: {{ error }}
+            {% endfor %}
+            {% for error in grf.inv_numbers.errors %}
+              <li>{{ grf.inv_numbers.label }}: {{ error }}
+            {% endfor %}
+          </ul>
+          {% endif %}
+        {% endwith %}
+      </div>
+    </div>
     <div class="grid-x grid-padding-x no-margin-right">
       <div class="cell medium-3">
-        <select name="form-FORMID-category">
-          {% for category in categories_set %}
-            <option value="{{ category.pk }}">{{ category }}</option>
-          {% endfor %}
-        </select>
+        {{ goods_row_form.category }}
       </div>
       <div class="cell auto">
-        <input list="goods" name="form-FORMID-goods" placeholder="ТМЦ" type="text">
+        {{ goods_row_form.goods }}
         <datalist id="goods">
           {% for goods in goods_set %}
             <option value="{{ goods }}">{{ goods }}</option>
@@ -22,18 +49,14 @@
             <p>Количество:</p>
           </div>
           <div class="cell auto no-padding-left">
-            <input type="number" min="0" step="any" name="form-FORMID-quantity">
+            {{ goods_row_form.quantity }}
           </div>
         </div>
       </div>
       <div class="cell medium-2 no-padding-right">
-        <select name="form-FORMID-measure">
-          {% for measure in measures_set %}
-            <option value="{{ measure.pk }}">{{ measure }}</option>
-          {% endfor %}
-        </select>
+        {{ goods_row_form.measure }}
       </div>
-      <div class="cell shrink no-padding-right close-btn hidden" id="deleteRow">
+      <div class="cell shrink no-padding-right close-btn {% if forloop.counter0 == 0 %}hidden{% endif %}" onclick="removeGoodsRow({{ forloop.counter0 }})">
         <p>x</p>
       </div>
     </div>
@@ -41,7 +64,7 @@
   <div class="cell cell-block-container">
     <div class="grid-x grid-padding-x no-margin-right">
       <div class="cell medium-2">
-        <input type="number" min="0" step="any" name="form-FORMID-price" placeholder="Цена">
+        {{ goods_row_form.price }}
       </div>
       <div class="cell shrink items-aligned-at-end">
         <label><input type="checkbox" name="form-FORMID-generate_inv_numbers" value="1"/>
@@ -49,7 +72,7 @@
         </label>
       </div>
       <div class="cell auto no-padding-right">
-        <input type="text" name="form-FORMID-inv_numbers", placeholder="Инвентарные номера">
+        {{ goods_row_form.inv_numbers }}
       </div>
     </div>
   </div>

@@ -26,7 +26,13 @@
       <input type="hidden" name="form-TOTAL_FORMS" value="{{ goods_form_set|length }}">
       <input type="hidden" name="form-INITIAL_FORMS" value="1">
       <input type="hidden" name="form-MAX_NUM_FORMS" value="">
-      <div id="goodsRowsContainer"></div>
+      <div id="goodsRowsContainer">
+        {% if goods_form_set.is_bound %}
+          {% for goods_row_form in goods_form_set %}
+            {% include "common/transfer_form_goods_row.html" %}
+          {% endfor %}
+        {% endif %}
+      </div>
 
       <div class="cell">
         <button class="hollow button success" type="button" onclick="addNewRow()">Добавить ещё один ТМЦ</button>
@@ -40,6 +46,7 @@
 {% endblock content %}
 
 {% block js %}
+  {% if not goods_form_set.is_bound %}
   <script type='text/javascript'>
     $(document).ready(function () {
       $('<div/>', {
@@ -47,4 +54,11 @@
       }).appendTo('#goodsRowsContainer');
     })
   </script>
+  {% else %}
+    <script type='text/javascript'>
+    $(document).ready(function () {
+      activateCloseButtonsOnGoodsRows();
+    })
+  </script>
+  {% endif %}
 {% endblock js %} 

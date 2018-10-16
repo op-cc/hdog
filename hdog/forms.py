@@ -1,4 +1,5 @@
 from datetime import date as ddate
+from decimal import Decimal
 
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist
@@ -62,7 +63,11 @@ class GoodsRowForm(forms.Form):
     goods = forms.CharField(label='ТМЦ', min_length=1)
     quantity = forms.IntegerField(label='Количество', initial=1, min_value=1)
     measure = forms.ModelChoiceField(label='Единица измерения', queryset=Measure.objects.all())
-    price = forms.IntegerField(label='Цена', initial=0, min_value=0)
+    price = forms.DecimalField(
+        label='Цена',
+        min_value=Decimal(0.01),
+        decimal_places=2,
+    )
     generate_inv_numbers = forms.BooleanField(
         label='Сгенерировать инвентарные номера',
         required=False
